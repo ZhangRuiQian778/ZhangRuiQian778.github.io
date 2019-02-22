@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Genome on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/genome/</link>
+    <description>Recent content in Genome on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 27 May 2018 17:57:37 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/genome/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>circlize 绘制基因组circos plot</title>
+      <link>https://ZhangRuiQian778.github.io/post/circlize-%E7%BB%98%E5%88%B6%E5%9F%BA%E5%9B%A0%E7%BB%84circos-plot/</link>
+      <pubDate>Sun, 27 May 2018 17:57:37 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/circlize-%E7%BB%98%E5%88%B6%E5%9F%BA%E5%9B%A0%E7%BB%84circos-plot/</guid>
+      <description>&lt;p&gt;在学习绘制 Circos 图的时候发现有个 R 包也可以画。索性一起学习，下面就是使用 &lt;a href=&#34;https://github.com/jokergoo/circlize&#34;&gt;circlize&lt;/a&gt; 包绘制基因组图形的过程。circlize 有单独的功能可以绘制基因组图，但它同样可以用来绘制普通的 circos 图。这里强烈推荐阅读 &lt;a href=&#34;https://ytlogos.github.io/2017/06/25/%E7%94%A8circlize%E5%8C%85%E7%BB%98%E5%88%B6circos-plot/&#34;&gt;用circlize包绘制circos-plot&lt;/a&gt; 这篇博文，作者详细介绍了 circliza 使用的基本图形功能。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Speedseq及CNVnator安装</title>
+      <link>https://ZhangRuiQian778.github.io/post/speedseq%E5%8F%8Acnvnator%E5%AE%89%E8%A3%85/</link>
+      <pubDate>Mon, 23 Apr 2018 16:40:50 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/speedseq%E5%8F%8Acnvnator%E5%AE%89%E8%A3%85/</guid>
+      <description>SpeedSeq 是一个开源的基因组分析平台，能够快速完成全基因组数据的上游分析。SpeedSeq 包含四个模块：
+* speedseq align - Process paired-end FASTQ sequences to produce a duplicate-marked, sorted, indexed BAM file that can be processed with other SpeedSeq modules. * speedseq var - Run FreeBayes one or more BAM files * speedseq somatic - Run FreeBayes on a tumor/normal pair of BAM files * speedseq sv - Run LUMPY on one or more BAM files, with optional breakend genotyping and read-depth calculation.</description>
+    </item>
+    
+    <item>
+      <title>VEP注释突变小记</title>
+      <link>https://ZhangRuiQian778.github.io/post/vep%E6%B3%A8%E9%87%8A%E7%AA%81%E5%8F%98%E5%B0%8F%E8%AE%B0/</link>
+      <pubDate>Sat, 14 Apr 2018 15:33:41 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/vep%E6%B3%A8%E9%87%8A%E7%AA%81%E5%8F%98%E5%B0%8F%E8%AE%B0/</guid>
+      <description>VEP 是由 Ensemble 提供的突变注释工具，它能够提供强大且详细的突变注释信息。VEP 推荐使用 Cache database 来对突变进行注释。软件是由 perl 编写，软件的安装还是比较麻烦需要安装几个必要的 perl 模块。但是 VEP 同时提供的 docker 镜像，所以我就选择使用 docker 的方式来运行 VEP，省去了安装软件的麻烦。
+现在我安装一些常见的软件都是使用神器 Conda 安装，如果没有被收录到软件库中就去 DockerHub 搜一下碰碰运气，Docker 技术近两年非常火很多软件开发者都会上传软件镜像到 DockerHub。建议学习一下 Docker 了解一下新技术。 1. 从 DockerHub 上获取镜像
+docker pull willmclaren/ensembl-vep   下载安装需要的 Cache Data
+docekr run -i -t -v $HOME/vep_data:/home/vep/.vep willmclaren/ensembl-vep perl INSTALL.pl  -v 参数挂载一个主机目录到容器中，下载的 Cache 默认会存在于 /home/vep/.vep 文件夹中。按照软件提示下载即可，最好将所选物种的所有 Cache 都下载。这个过程比较耗费时间，记得对下载完成的 Cache 创建索引，会在后面注释过程节省时间。这里我选择的是山羊物种的 Cache。
+ 为 Cache 构建索引
+docekr run -i -t -v $HOME/vep_data:/home/vep/.</description>
+    </item>
+    
+  </channel>
+</rss>

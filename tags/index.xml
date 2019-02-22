@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/</link>
+    <description>Recent content in Tags on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Tue, 23 Oct 2018 18:04:46 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Dnase Seq</title>
+      <link>https://ZhangRuiQian778.github.io/tags/dnase-seq/</link>
+      <pubDate>Tue, 23 Oct 2018 18:04:46 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/dnase-seq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Genome</title>
+      <link>https://ZhangRuiQian778.github.io/tags/genome/</link>
+      <pubDate>Sun, 27 May 2018 17:57:37 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/genome/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Linux</title>
+      <link>https://ZhangRuiQian778.github.io/tags/linux/</link>
+      <pubDate>Tue, 11 Dec 2018 10:08:22 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Linxu</title>
+      <link>https://ZhangRuiQian778.github.io/tags/linxu/</link>
+      <pubDate>Tue, 18 Dec 2018 09:01:48 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/linxu/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>https://ZhangRuiQian778.github.io/tags/r/</link>
+      <pubDate>Thu, 06 Dec 2018 21:35:29 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Rna Seq</title>
+      <link>https://ZhangRuiQian778.github.io/tags/rna-seq/</link>
+      <pubDate>Tue, 11 Sep 2018 19:36:55 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/rna-seq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>玩的</title>
+      <link>https://ZhangRuiQian778.github.io/tags/%E7%8E%A9%E7%9A%84/</link>
+      <pubDate>Wed, 08 Aug 2018 11:41:35 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/tags/%E7%8E%A9%E7%9A%84/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

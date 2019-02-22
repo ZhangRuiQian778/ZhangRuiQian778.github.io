@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>[转载] 修改 docker 镜像存储位置 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="[转载] 修改 docker 镜像存储位置 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-11-14T10:20:48&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-11-14T10:20:48&#43;08:00">
+        
+    <meta name="description" content="[转载] 修改 docker 镜像存储位置">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/%E8%BD%AC%E8%BD%BD-%E4%BF%AE%E6%94%B9-docker-%E9%95%9C%E5%83%8F%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">[转载] 修改 docker 镜像存储位置</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年11月14日
+                            10:20
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#方法一-软链接">方法一、软链接</a></li>
+<li><a href="#方法二-修改镜像和容器的存放路径">方法二、修改镜像和容器的存放路径</a></li>
+<li><a href="#方法三-system下创建配置文件">方法三、system下创建配置文件</a></li>
+<li><a href="#方法四-使用docker-storage-set-docker1-12-命令进行配置">方法四、使用docker-storage-set（docker1.12）命令进行配置</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <h3 id="方法一-软链接">方法一、软链接</h3>
+
+<p>默认情况下Docker的存放位置为：/var/lib/docker</p>
+
+<p>可以通过下面命令查看具体位置：</p>
+
+<p>sudo docker info | grep &ldquo;Docker Root Dir&rdquo;</p>
+
+<p>解决这个问题，最直接的方法当然是挂载分区到这个目录，但是我的数据盘还有其他东西，这肯定不好管理，所以采用修改镜像和容器的存放路径的方式达到目的。</p>
+
+<p>这个方法里将通过软连接来实现。</p>
+
+<p>首先停掉Docker服务：</p>
+
+<p>systemctl restart docker或者service docker stop</p>
+
+<p>然后移动整个/var/lib/docker目录到目的路径：</p>
+
+<p>mv /var/lib/docker /root/data/dockerln -s /root/data/docker /var/lib/docker</p>
+
+<p>这时候启动Docker时发现存储目录依旧是/var/lib/docker，但是实际上是存储在数据盘的，你可以在数据盘上看到容量变化。</p>
+
+<h3 id="方法二-修改镜像和容器的存放路径">方法二、修改镜像和容器的存放路径</h3>
+
+<p>指定镜像和容器存放路径的参数是&ndash;graph=/var/lib/docker，我们只需要修改配置文件指定启动参数即可。</p>
+
+<p>Docker 的配置文件可以设置大部分的后台进程参数，在各个操作系统中的存放位置不一致，在 Ubuntu 中的位置是：/etc/default/docker，在 CentOS 中的位置是：/etc/sysconfig/docker。</p>
+
+<p>如果是 CentOS6 则添加下面这行：</p>
+
+<p>OPTIONS=&ndash;graph=&ldquo;/root/data/docker&rdquo; &ndash;selinux-enabled -H fd://</p>
+
+<p>如果是 Ubuntu 则添加下面这行（因为 Ubuntu 默认没开启 selinux）：</p>
+
+<p>OPTIONS=&ndash;graph=&ldquo;/root/data/docker&rdquo; -H fd://# 或者DOCKER_OPTS=&ldquo;-g /root/data/docker&rdquo;</p>
+
+<p>最后重新启动，Docker 的路径就改成 /root/data/docker 了。</p>
+
+<p>centos7下，也可以</p>
+
+<p>修改docker.service文件，使用-g参数指定存储位置</p>
+
+<p>vi /usr/lib/systemd/system/docker.service</p>
+
+<p>ExecStart=/usr/bin/dockerd &ndash;graph /new-path/docker</p>
+
+<p>// reload配置文件</p>
+
+<p>systemctl daemon-reload</p>
+
+<p>// 重启docker</p>
+
+<p>systemctl restart docker.service</p>
+
+<p>如果docker是1.12或以上的版本，可以修改（或新建）daemon.json文件。修改后会立即生效，不需重启docker服务。</p>
+
+<p>vim /etc/docker/daemon.json</p>
+
+<p>{&ldquo;registry-mirrors&rdquo;: [&ldquo;<a href="http://7e61f7f9.m.daocloud.io&quot;],&quot;graph&quot;:">http://7e61f7f9.m.daocloud.io&quot;],&quot;graph&quot;:</a> &ldquo;/new-path/docker&rdquo;}</p>
+
+<h3 id="方法三-system下创建配置文件">方法三、system下创建配置文件</h3>
+
+<p>在/etc/systemd/system/docker.service.d 目录下创建一个Drop-In文件“docker.conf”，默认 docker.service.d 文件夹不存在。所以你必须先创建它。</p>
+
+<p>创建Drop-In 文件的原因，是我们希望Docker 服务，使用docker.conf文件中提到的特定参数，将默认服务所使用的位于/lib/systemd/system/docker.service文件中的参数进行覆盖。如果你想深入了解Drop-In，请阅读system.unit文档</p>
+
+<p>定义新的存储位置现在打开docker.conf增加如下内容：</p>
+
+<p># sudo vi /etc/systemd/system/docker.service.d/docker.conf</p>
+
+<p>[Service]</p>
+
+<p>ExecStart=</p>
+
+<p>ExecStart=/usr/bin/dockerd &ndash;graph=&ldquo;/mnt/new_volume&rdquo; &ndash;storage-driver=devicemapper</p>
+
+<p>保存并退出VI编辑器，/mnt/new_volume 是新的存储位置，而devicemapper是当前docker所使用的存储驱动。如果你的存储驱动有所不同，请输入之前第一步查看并记下的值。Docker官方文档中提供了更多有关各种存储驱动器的信息。现在，你可以重新加载服务守护程序，并启动Docker服务了。这将改变新的镜像和容器的存储位置。</p>
+
+<p># sudo systemctl daemon-reload</p>
+
+<p># sudo systemctl start docker</p>
+
+<p>为了确认一切顺利，运行 # docker info 命令检查Docker 的根目录.它将被更改为/mnt/new_volume</p>
+
+<h3 id="方法四-使用docker-storage-set-docker1-12-命令进行配置">方法四、使用docker-storage-set（docker1.12）命令进行配置</h3>
+
+<p>配置文件位置：/usr/lib/docker-storage-setup/docker-storage-setup或者/etc/sysconfig/docker-storage-setup、/etc/sysconfig/docker-storage</p>
+
+<p>vim /etc/sysconfig/docker-storage</p>
+
+<p># This file may be automatically generated by an installation program.</p>
+
+<p># Please DO NOT edit this file directly. Instead edit</p>
+
+<p># /etc/sysconfig/docker-storage-setup and/or refer to</p>
+
+<p># &ldquo;man docker-storage-setup&rdquo;.</p>
+
+<p># By default, Docker uses a loopback-mounted sparse file in</p>
+
+<p># /var/lib/docker.  The loopback makes it slower, and there are some</p>
+
+<p># restrictive defaults, such as 100GB max storage.</p>
+
+<p>DOCKER_STORAGE_OPTIONS=&ndash;graph=&ldquo;要保存的路径&rdquo;</p>
+
+<p>或者</p>
+
+<p>DEVS=/dev/vdb</p>
+
+<p>DATA_SIZE=800GB（更改docker默认存储大小）</p>
+
+<p>Ref:<a href="http://blog.51cto.com/forangela/1949947">四个修改Docker默认存储位置的方法</a></p>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/linux">linux</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

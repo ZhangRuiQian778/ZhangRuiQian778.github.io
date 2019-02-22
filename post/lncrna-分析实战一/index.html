@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LncRNA 分析实战(一) - Juichien&#39;s blog</title>
+    <meta property="og:title" content="LncRNA 分析实战(一) - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-08-17T12:49:05&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-08-17T12:49:05&#43;08:00">
+        
+    <meta name="description" content="LncRNA 分析实战(一)">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/lncrna-%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%E4%B8%80/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">LncRNA 分析实战(一)</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年8月17日
+                            12:49
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#引言">引言</a></li>
+<li><a href="#准备工作">准备工作</a>
+<ul>
+<li><a href="#a-安装需要的软件">A. 安装需要的软件</a></li>
+<li><a href="#目录树">目录树</a></li>
+<li><a href="#下载物种基因组">下载物种基因组</a></li>
+</ul></li>
+<li><a href="#流程">流程</a>
+<ul>
+<li><a href="#步骤1-测序数据质量控制">步骤1：测序数据质量控制</a></li>
+<li><a href="#步骤2-使用-star-比对到参考基因组">步骤2：使用 STAR 比对到参考基因组</a></li>
+<li><a href="#步骤3-使用-stringtie-拼接转录本">步骤3：使用 stringtie 拼接转录本</a></li>
+<li><a href="#步骤4-使用-gffcompare-分析转录本">步骤4：使用 gffcompare 分析转录本</a></li>
+</ul></li>
+<li><a href="#步骤5-筛选">步骤5：筛选</a></li>
+<li><a href="#步骤6-lncrna-编码能力预测">步骤6：LncRNA 编码能力预测</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <h2 id="引言">引言</h2>
+
+<p>lncRNA 分析过程可以分为：质量控制；参考基因组比对；转录本拼装；LncRNA 鉴定；LncRNA 靶基因预测；LncRNA 定量；筛选差异 LncRNA 等。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<h3 id="a-安装需要的软件">A. 安装需要的软件</h3>
+
+<p>绝大部分软件我们都可以通过 Conda 工具安装， Conda 是一个开源包管理系统和环境管理系统，用于安装多个版本的软件包及其依赖关系。生信上常用的软件可以通过它来安装，非常方便可以解决很多在安装软件过程中的问题。</p>
+
+<p>软件列表：<br />
+1. <a href="https://github.com/OpenGene/fastp">fastp</a>
+2. <a href="https://github.com/alexdobin/STAR">STAR</a><br />
+3. <a href="https://ccb.jhu.edu/software/stringtie/">StringTie</a><br />
+4. <a href="https://ccb.jhu.edu/software/stringtie/gffcompare.shtml">GffCompare</a>
+5. <a href="http://ccb.jhu.edu/software/stringtie/gff.shtml">gffread</a>
+6. <a href="http://bioinf.wehi.edu.au/featureCounts/">featureCounts</a>
+7. <a href="http://cpc2.cbi.pku.edu.cn/">CPC2</a>
+8. <a href="https://github.com/www-bioinfo-org/CNCI">CNCI</a><br />
+9. <a href="https://github.com/tderrien/FEELnc">FEELnc</a>
+10. <a href="https://www.ebi.ac.uk/Tools/pfa/pfamscan/">PfamScan</a></p>
+
+<p>其中需要手动安装的是：CPC2、CNCI、PfamScan。</p>
+
+<pre><code># CPC2
+wget http://cpc2.cbi.pku.edu.cn/data/CPC2-beta.tar.gz
+tar -zxvf CPC2-beta.tar.gz
+cd CPC2-beta/libs/libsvm
+tar -zxvf libsvm-3.18.tar.gz
+make clean &amp;&amp; make
+ 
+# CNCI
+git clone https://github.com/www-bioinfo-org/CNCI.git
+cd CNCI
+unzip libsvm-3.0.zip
+cd libsvm-3.0
+make
+
+# PfamScan
+wget http://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz
+tar -zxvf PfamScan.tar.gz
+mv PfamScan ../
+</code></pre>
+
+<h3 id="目录树">目录树</h3>
+
+<p>一个结构清晰的目录树让分析过程清晰条理，以后再整理数据的时候也有章可循。</p>
+
+<pre><code>├── bin
+├── genome
+│   └── STAR_index
+├── input
+│   ├── clean_data
+│   └── raw_data
+└── output
+    ├── CNCI
+    ├── CPC2
+    ├── FEELnc
+    ├── gffcompare
+    ├── PfamScan
+    ├── STAR_map
+    └── Stringtie_assembly
+</code></pre>
+
+<h3 id="下载物种基因组">下载物种基因组</h3>
+
+<p>在比对过程中我们需要用到研究物种对应的参考基因组 (fasta/fa/fna)，后续的转录本拼接以及表达定量过程中需要参考注释文件 (GTF/GFF)，这里需要注意不同数据库（NCBI，Ensembl，USCS）中的基因组数据不能通用，也就是如果在比对用的 NCBI 上的参考基因组文件，定量过程中就不可以用 Ensemble 或者USCS 的注释文件。<br />
+对于人和小鼠推荐在 <a href="https://www.gencodegenes.org/">Genecode</a> 中下载需要的数据，这个数据更新及时，注释全面，非常实用。<br />
+我平时习惯用 NCBI 和Ensemble 数据库，所以就下载这两个数据库的参考基因组数据</p>
+
+<p>1.Pig (NCBI)</p>
+
+<pre><code># 下载参考基因组
+wget -P genome ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/003/025/GCF_000003025.6_Sscrofa11.1/GCF_000003025.6_Sscrofa11.1_genomic.fna.gz
+
+# 下载注释文件
+wget -P genome ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/003/025/GCF_000003025.6_Sscrofa11.1/GCF_000003025.6_Sscrofa11.1_genomic.gff.gz
+
+</code></pre>
+
+<ol>
+<li>Pig (Ensemble)</li>
+</ol>
+
+<pre><code># 下载参考基因组
+wget -P genome ftp://ftp.ensembl.org/pub/release-93/fasta/sus_scrofa/dna/Sus_scrofa.Sscrofa11.1.dna.toplevel.fa.gz
+
+# 下载注释文件
+wget -P genome ftp://ftp.ensembl.org/pub/release-93/gtf/sus_scrofa/Sus_scrofa.Sscrofa11.1.93.gtf.gz
+</code></pre>
+
+<h2 id="流程">流程</h2>
+
+<p>将原始测序数据放入指定文件夹中，以三个双端测序的样品为例。</p>
+
+<pre><code>Pig_2-1_RRL18214-V_1.fq.gz*
+Pig_2-1_RRL18214-V_2.fq.gz*
+Pig_2-2_RRL18215-V_1.fq.gz*
+Pig_2-2_RRL18215-V_2.fq.gz*
+Pig_2-3_RRL18216-V_1.fq.gz*
+Pig_2-3_RRL18216-V_2.fq.gz*
+</code></pre>
+
+<h3 id="步骤1-测序数据质量控制">步骤1：测序数据质量控制</h3>
+
+<p>我推荐使用 fastp 来对测序数据进行质控，软件运行速度快，如果只作简单修剪和去除低质量碱基等工作使用软件默认参数自动完成即可同时可以生成一份动态的质量报告。</p>
+
+<pre><code>fastp -i ./raw_data/Pig_2-1_RRL18214-V_1.fq.gz -I ./raw_data/Pig_2-1_RRL18214-V_2.fq.gz -o ./clean_out/Pig_2-1_good_1.fq.gz -O ./clean_out/Pig_2-1_good_2.fq.gz
+</code></pre>
+
+<h3 id="步骤2-使用-star-比对到参考基因组">步骤2：使用 STAR 比对到参考基因组</h3>
+
+<ol>
+<li><p>首先要建立 STAR index。</p>
+
+<pre><code>STAR --runThreadN 20 \
+--runMode genomeGenerate \
+--genomeDir ./genome/STAR_index \
+--genomeFastaFiles ./genome/GCF_000003025.6_Sscrofa11.1_genomic.fna \
+--sjdbGTFfile ./genome/GCF_000003025.6_Sscrofa11.1_genomic.gtf \
+--sjdbOverhang 149
+</code></pre></li>
+
+<li><p>命令</p></li>
+</ol>
+
+<pre><code>STAR --runThreadN 20 \
+--genomeDir ./genome/STAR_index \
+--readFilesCommand zcat \
+--readFilesIn Pig_2-1_good_1.fq.gz Pig_2-1_good_2.fq.gz \
+--outSAMtype BAM SortedByCoordinate \
+--outFileNamePrefix ./output/STAR_map/Pig_2-1
+
+samtools index Pig_2-1Aligned.sortedByCoord.out.bam 
+</code></pre>
+
+<p>LncRNA 通常为链特异建库像 hisat2 tophat 等软件在使用的时候需要增加识别文库的参数而 STAR 不需要。软件 manual 中提到链特异数据不需要特别指定但是如果下游使用 Cufflinks 等软件的时候需要指定文库，比如：*&ndash;library-type fr-firststrand*。
+&gt;If you have stranded RNA-seq data, you do not need to use any specific STAR options. Instead,
+you need to run Cufflinks with the library option &ndash;library-type options. For example, cufflinks
+&hellip; &ndash;library-type fr-firststrand should be used for the standard dUTP protocol, including
+Illumina’s stranded Tru-Seq. This option has to be used only for Cufflinks runs and not for STAR
+runs.</p>
+
+<h3 id="步骤3-使用-stringtie-拼接转录本">步骤3：使用 stringtie 拼接转录本</h3>
+
+<p>完成比对步骤后对每一个 bam 文件进行转录本拼接。</p>
+
+<pre><code>stringtie --rf -p 20 -G ~/disk_4T/pig_genomes/NCBI/Sscrofa11.1/GCF_000003025.6_Sscrofa11.1_genomic.gtf -o ./output/Stingtie_assembly/Pig_2-1.gtf Pig_2-1Aligned.sortedByCoord.out.bam
+</code></pre>
+
+<p><strong>&ndash;rf</strong> 参数就是上文提到类似 &ndash;library-type fr-firststrand 的参数，如果没有指定这个参数生成的注释文件都是单外显子转录本。</p>
+
+<p>接下来将所有样品拼接得到的转录本合并。</p>
+
+<pre><code>ls ./output/Stingtie_assembly/ &gt;mergelist.txt
+cd ./output/Stingtie_assembly/
+stringtie --merge -p 20 -m 200 -o stringtie_merge.gtf mergelist.txt
+</code></pre>
+
+<h3 id="步骤4-使用-gffcompare-分析转录本">步骤4：使用 gffcompare 分析转录本</h3>
+
+<p>将所有样品转录本合并为一个后使用 gffcompre 软件和参考注释文件比较。</p>
+
+<pre><code>gffcompare -R -M -r ./genome/GCF_000003025.6_Sscrofa11.1_genomic.gtf -o ./output/gffcompare/compare ./output/Stingtie_assembly/stringtie_merge.gtf
+</code></pre>
+
+<h2 id="步骤5-筛选">步骤5：筛选</h2>
+
+<p>从上一步得到结果中筛选 LncRNA 。<br />
+基础筛选条件：
+* gffcompare 结果中根据 class_code类型进行初步筛选，选择 “i”,“x”,“u”,“o”,“e” 类型。具体含义如下图所示。
+* 长度 ≥ 200bp(必选)，Exon ≥ 2(可选)
+* FPKM ≥ 0.1 (根据测序深度调整)</p>
+
+<p>需要说明的是长度、exon 个数和 FPKM 条件已经在拼接转录本过程中筛选完成，这里主要根据 gffcomapre 结果中的 class_code 进行筛选。</p>
+
+<pre><code>cd ./output/gffcompare/
+less compare.annotated.gtf |grep 'class_code &quot;[ixuoe]&quot;' |awk '{print $10}'|sed 's/\./\\\\./g' &gt; grep.txt
+cat grep.txt| while read id 
+do
+cat compare.annotated.gtf|grep ${id} &gt;&gt; assembly_lncRNA.gtf
+done
+</code></pre>
+
+<h2 id="步骤6-lncrna-编码能力预测">步骤6：LncRNA 编码能力预测</h2>
+
+<p>上一步筛选得到的转录本需要继续对编码能力进行鉴定后才能筛选出最可能的 LncRNA 。这里我选用了 CPC2、CNCI、FEELnc 和 PfamScan 来鉴定 LncRNA 。
+其中 CPC2 和 CNCI 输入文件为 fasta 格式，PfamScan 输入文件格式为氨基酸序列，所以要根据要求将 GTF 文件转为合适的格式。</p>
+
+<pre><code>gffread -w ./output/gffcompare/lncRNA_transcript.fa -g ./genome/GCF_000003025.6_Sscrofa11.1_genomic.fna ./output/gffcompare/assembly_lncNRA.gtf
+transeq ./output/gffcompare/lncRNA_transcript.fa ./output/gffcompare/lncRNA_protein_mid.fa
+sed 's/*//g' ./output/gffcompare/lncRNA_protein_mid.fa &gt; ./output/gffcompare/lncRNA_protein.fa
+rm ./output/gffcompare/lncRNA_protein_mid.fa
+
+~/bio-software/CPC2-beta/bin/CPC2.py -i ./output/gffcompare/lncRNA_transcript.fa -o ./output/CPC2/CPC2_result.txt
+less CPC2_result.txt|grep 'noncoding'|awk '{print $1}'&gt; CPC2_id.txt
+
+python ~/bio-software/CNCI/CNCI.py -f ./output/gffcompare/lncRNA_transcript.fa -p 10 -m ve -o ./output/CNCI
+less CNCI.index|grep 'noncoding'|awk '{print $1}' &gt; CNCI_id.txt
+
+./pfam_scan.pl -cpu 20 -fasta ./output/gffcompare/lncRNA_protein.fa -dir ~/disk_4T/Pfam_database -out ./output/PfamScan/Pfam_result.txt
+less Pfam_result.txt|grep -v '#'|awk '{print $1}' &gt; Pfam_id.txt
+comm -13 &lt;(sort Pfam_id.txt) &lt;(sort lncRNA_id.txt) &gt; Pfam_id1.txt
+mv Pfam_id1.txt Pfam_id.txt
+
+mkdir intersection
+mv lncRNA_id.txt ./CPC2/CPC2_id.txt ./CNCI/CNCI_id.txt ./PfamScan/Pfam_id.txt ./intersection
+
+FEELnc_filter.pl -i ./output/Stingtie_assembly/stringtie_merge.gtf \
+-a ./genome/GCF_000003025.6_Sscrofa11.1_genomic.gtf -p 20 \
+-b transcript_biotype=protein_coding \
+--monoex=-1 &gt; ./output/FEELnc/filter_lncrna.gtf
+ 
+FEELnc_codpot.pl -i ./output/FEELnc/filter_lncrna.gtf -a ./genome/GCF_000003025.6_Sscrofa11.1_genomic.gtf \
+-g ~/disk_4T/pig_genomes/Ensembl/Sus_scrofa.Sscrofa11.1.dna.toplevel.fa -p 20 \
+-b transcript_biotype=protein_coding  \
+--mode=intergenic --outdir ./output/FEELnc/feelnc_codpot_out/
+
+ 
+FEELnc_classifier.pl -i ./output/FEELnc/feelnc_codpot_out/filter_lncrna.gtf.lncRNA.gtf \
+-a ./genome/GCF_000003025.6_Sscrofa11.1_genomic.gtf &gt; ./output/FEELnc/lncRNA_classes.txt
+
+less intersection.txt |sed 's/\./\\\\./g' &gt; grep.txt
+cat grep.txt| while read id 
+do
+less ./assembly_lncRNA.gtf|grep &quot;${id}&quot; &gt;&gt; Final_lncRNA.gtf
+done
+
+</code></pre>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/rna-seq">RNA-seq</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

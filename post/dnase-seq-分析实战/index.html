@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DNase-seq 分析实战 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="DNase-seq 分析实战 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-10-23T18:04:46&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-10-23T18:04:46&#43;08:00">
+        
+    <meta name="description" content="DNase-seq 分析实战">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/dnase-seq-%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">DNase-seq 分析实战</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年10月23日
+                            18:04
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#dnase-seq-知识点">DNase-seq 知识点</a></li>
+<li><a href="#数据获取">数据获取</a></li>
+<li><a href="#数据质控">数据质控</a></li>
+<li><a href="#read-alignment">read alignment</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <p>最近喜欢看一些表观遗传方面的东西，像 ChiP-seq、DNase-seq 和 ATAC-seq 等技术现在应用也比较广泛，借着兴趣把这些东西都学习一下。首先做 DNase-seq 实战系列，以后会把其他技术的分析学习整理后发上来。</p>
+
+<h2 id="dnase-seq-知识点">DNase-seq 知识点</h2>
+
+<p>DNase-seq (DNase I hypersensitive sites sequencing)，是基于对DNase I切割敏感的区域的全基因组测序，是用于鉴定基因调节区域的分子生物学方法。FAIRE-Seq是DNase-seq的继承者，用于基因组范围内基因组中可及DNA区域的鉴定。用于鉴定开放染色质区域的两种方案都具有取决于潜在核小体结构的偏差。例如，FAIRE-seq在非启动子区域提供更高的标签计数。另一方面，DNase-seq信号在启动子区域较高，并且已显示DNase-seq甚至在非启动子区域具有比FAIRE-seq更好的灵敏度。</p>
+
+<blockquote>
+<p>染色质变得开放，就意味着DNA和组蛋白的浓聚程度降低，就会有一部分DNA暴露出来。而一旦失去了蛋白质的保护，这部分DNA就可以被DNA酶（MNase或DNase I）所切割。然后，我们再把切割完的DNA拿来测序，和已知的全基因组序列相比较，就能发现被切掉的是哪些地方，没有被切掉的地方又在哪里，从而获知开放的染色质区域。</p>
+</blockquote>
+
+<p>核小体区域对 DNase I 敏感，并且这些敏感区域与真核生物中的基因激活表达相关，DNase I 超敏感位点通常包括：启动子、增强子、沉默子、绝缘子和基因座控制区域。传统使用 Southern 方法来鉴定 DNase 超敏位点，但是这种低通量方法的局限性是显而易见的。Lingyun Song 和 Gregory E. Crawford 将这种方法和高通量测序结合开发出 DNase-seq 技术。</p>
+
+<h2 id="数据获取">数据获取</h2>
+
+<p>选择一篇整合了人和小鼠原始生殖细胞发育过程中染色质动态变化研究的文章。他在现有的 DNase-seq 技术基础上进行改进获得 low-input DNase-seq，只需要300-3000个细胞即可。文章的研究比较宏观，以小鼠为例，分别测了9.5、10.5、12.5、13.5、14.5 和 16.5 天的雌雄生殖细胞。时间点测得比较全也方便我们去重现他的研究。</p>
+
+<p>首先获得数据：GSE109770。数据下载方式主要有：FTP、sratoolkit 和 aspera。我习惯使用 sratoolkit ，比 FTP 快许多，比 aspera慢一点。<br />
+1. 在查询网站上输入 GEO 号，<a href="https://www.ncbi.nlm.nih.gov/Traces/study/">https://www.ncbi.nlm.nih.gov/Traces/study/</a><br />
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/181023/b92lC2mH1B.jpg?imageslim" alt="mark" /><br />
+2. 选择需要的数据后获得 SRR 号的文本</p>
+
+<pre><code>SRR6519360
+SRR6519361
+SRR6519362
+SRR6519363
+SRR6519364
+SRR6519365
+SRR6519366
+SRR6519367
+SRR6519368
+SRR6519370
+SRR6519369
+SRR6519371
+SRR6519372
+SRR6519373
+SRR6519374
+SRR6519375
+SRR6519377
+SRR6519376
+SRR6519378
+SRR6519379
+SRR6519380
+SRR6519381
+SRR6519382
+SRR6519383
+SRR6519384
+SRR6519385
+SRR6519386
+SRR6519387
+SRR6519388
+SRR6519389
+</code></pre>
+
+<ol>
+<li>下载示例<br />
+<code>
+prefetch --option-file SRR_Acc_List.txt
+</code></li>
+<li>解压数据<br />
+<code>
+ls *sra |while read id 
+do 
+fast-dump --gzip --split-3 ${id} &amp;
+done 
+</code></li>
+</ol>
+
+<h2 id="数据质控">数据质控</h2>
+
+<ol>
+<li>fastqc 检测<br />
+<code>
+ls *fastq.gz|while read id 
+do 
+fastqc ${id} &amp;
+done 
+</code></li>
+<li>数据过滤
+<code>
+ls fastq.gz|while read id 
+do 
+fastp -i ${id} -o ${id%%.*}_good.fq.gz
+done
+</code></li>
+</ol>
+
+<h2 id="read-alignment">read alignment</h2>
+
+<pre><code>bowtie2 -k 4 -X 2000 --local --mm --no-mixed --no-discordant --threads 5 -x ~/disk_4T/mouse_genome/GRCm38.p5/Bowtie2_index/GRCm38.p5 -U $id 2&gt;${id%%_*}.log | \
+samtools view -Su - | samtools sort - -o ${id%%_*}.bam
+</code></pre>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/dnase-seq">DNase-seq</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

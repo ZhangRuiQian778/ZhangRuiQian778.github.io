@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linxu on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/linxu/</link>
+    <description>Recent content in Linxu on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Tue, 18 Dec 2018 09:01:48 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/linxu/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Manjaro 安装配置备忘</title>
+      <link>https://ZhangRuiQian778.github.io/post/manjaro-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%A4%87%E5%BF%98/</link>
+      <pubDate>Tue, 18 Dec 2018 09:01:48 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/manjaro-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%A4%87%E5%BF%98/</guid>
+      <description>&lt;p&gt;周末工作不饱和把机器装了一个 linux 发行版——Manjaro，对 Arch linux 的大名生畏只能先尝试基于 Arch 的衍生版看能不能适用。&lt;br /&gt;
+镜像直接在官网下载，版本是 KDE 。这个版本应该只是桌面环境的区别，包含：Xfce，KDE 和 gnome 。制作U盘启动盘的时候推荐使用 &lt;strong&gt;USBwriter&lt;/strong&gt; 这款软件，开始使用 rufus 制作一直不顺利，不知道是不是软件版本不合适。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>理解“平均负载”</title>
+      <link>https://ZhangRuiQian778.github.io/post/%E7%90%86%E8%A7%A3%E5%B9%B3%E5%9D%87%E8%B4%9F%E8%BD%BD/</link>
+      <pubDate>Sun, 25 Nov 2018 15:19:43 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/%E7%90%86%E8%A7%A3%E5%B9%B3%E5%9D%87%E8%B4%9F%E8%BD%BD/</guid>
+      <description>&lt;p&gt;我们通常会使用 top 或者 uptime 命令来了解系统目前负载情况。平均负载（load average）包含三个项目，分别是 1分钟，5分钟，15分钟 系统的负载情况。那么平均负载的含义是什么呢？刚使用 Ubuntu 的时候，我通过 top 命令来查看系统负载，只是把 load average 理解为 CPU 利用率情况。但是自己对平均负载的本质并不理解，也不清楚三个值什么情况下代表系统过载。最近学习构建高性能Linux 服务器，要将一些基础知识补充。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

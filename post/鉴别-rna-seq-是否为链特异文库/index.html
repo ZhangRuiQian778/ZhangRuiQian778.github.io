@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>鉴别 RNA-seq 是否为链特异文库 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="鉴别 RNA-seq 是否为链特异文库 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-07-24T16:46:34&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-07-24T16:46:34&#43;08:00">
+        
+    <meta name="description" content="鉴别 RNA-seq 是否为链特异文库">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/%E9%89%B4%E5%88%AB-rna-seq-%E6%98%AF%E5%90%A6%E4%B8%BA%E9%93%BE%E7%89%B9%E5%BC%82%E6%96%87%E5%BA%93/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">鉴别 RNA-seq 是否为链特异文库</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年7月24日
+                            16:46
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#方法">方法</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <p>最近从公司返回一批 lncRNA 测序数据。一般来说 lncRNA-seq 通常采用链特异建库的方式。链特异文库的特性使我们在具体处理过程中需要和普通文库区别开来。具体体现在 map reference genome 和 gene expression summarization 两步上。</p>
+
+<p>比对软件我选择的是 STAR 。软件说明书介绍并不需要特别对链特异文库设置参数，这比较好。但是其他的比对软件很多需要设置参数，比如 hisat2 。reads summarization 我选择使用 featureCounts 。它需要设置 <em>-s</em> 参数为 strand-specific ，我在设置参数获得表达量数据时发现 Successfully assigned reads 大概只有 30% 。然后又将参数设置为非链特异文库，Successfully assigned reads 大概升高到 50% 。这个结果让我怀疑文库建库方式是否时链特异。因为如果普通文库设置链特异文库的参数后会导致大量 reads 丢失。但是从上面的结果并不能得出是到底建的是哪种文库。我们需要具体分析 reads 在参考基因组上分布情况才能得出结论。</p>
+
+<p><a href="http://rseqc.sourceforge.net/">RSeQC: An RNA-seq Quality Control Package</a> 里面的 infer_experiment.py 脚本可以统计 strandness of reads  and standness of transcripts 之间的关系。大概方式是： 单端和双端测序都有两种不同的链特异方式。脚本来统计这两种方式的占比，如果两种方式占比相似那就是非链特异建库，而两种占比差异悬殊就是链特异建库（一种 90%+，一种 &lt;10%）。</p>
+
+<h2 id="方法">方法</h2>
+
+<ol>
+<li><p>安装 RSeQC<br />
+老办法，不报错。</p>
+
+<pre><code>conda install RSeQC
+</code></pre></li>
+
+<li><p>GTF file convert to BED file
+脚本需要提供 BED format 文件。之前安装的 <a href="http://bedops.readthedocs.io/en/latest/index.html">BEDOPS</a> 里面有现成的脚本，不需要再造轮子了。</p>
+
+<pre><code>gtf2bed &lt; GCF_000003025.6_Sscrofa11.1_genomic.gtf &gt; Sscrofa11.1.bed
+</code></pre></li>
+
+<li><p><a href="http://rseqc.sourceforge.net/">infer_experiment.py</a> 统计</p>
+
+<pre><code>infer_experiment.py  -i Pig_2-1Aligned.sortedByCoord.out.bam -r Sscrofa11.1.bed
+##############################
+Reading reference gene model Sscrofa11.1.bed ... Done
+Loading SAM/BAM file ...  Total 200000 usable reads were sampled
+This is PairEnd Data
+Fraction of reads failed to determine: 0.0206
+Fraction of reads explained by &quot;1++,1--,2+-,2-+&quot;: 0.0394
+Fraction of reads explained by &quot;1+-,1-+,2++,2--&quot;: 0.9400
+</code></pre>
+
+<p>从上面的结果可以看出我的 lncRNA 建库方式为链特异。</p></li>
+</ol>
+
+<p>但是 featureCounts 软件参数设置的问题我还没有解决。。。</p>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/rna-seq">RNA-seq</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

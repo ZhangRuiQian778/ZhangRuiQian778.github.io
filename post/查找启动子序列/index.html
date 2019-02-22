@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>查找启动子序列 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="查找启动子序列 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-04-17T14:22:24&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-04-17T14:22:24&#43;08:00">
+        
+    <meta name="description" content="查找启动子序列">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/%E6%9F%A5%E6%89%BE%E5%90%AF%E5%8A%A8%E5%AD%90%E5%BA%8F%E5%88%97/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">查找启动子序列</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年4月17日
+                            14:22
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#ncbi-寻找-promoter-区域">NCBI 寻找 promoter 区域</a></li>
+<li><a href="#ensemble-查找基因-promoter-region">Ensemble 查找基因 promoter region</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            
+
+<p>帮一个老师找基因的启动子区域，网上资料比较多也比较杂。过程虽然比较简单但还是记录一下。</p>
+
+<p>首先需要搞清楚 promoter 是什么？ 启动子指的是 RNA 聚合酶特异性识别和结合的 DNA 序列，它属于 non-coding region。同时我们也需要明白 UTR(UntranslatedRegions) 的概念：它是 mRNA分子两端的非编码片段。5&rsquo;-UTR从mRNA起点的甲基化鸟嘌呤核苷酸帽延伸至AUG起始密码子，3&rsquo;-UTR从编码区末端的终止密码子延伸至多聚A尾巴（Poly-A）的末端。<br />
+<!-- more -->
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/HC61a022DJ.jpg?imageslim" alt="mark" /><br />
+上面这张图能够帮助我们理解上述概念。</p>
+
+<h2 id="ncbi-寻找-promoter-区域">NCBI 寻找 promoter 区域</h2>
+
+<p>以 ABCA1 基因为例，在 NCBI 上搜索这个基因，物种选择山羊。<br />
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/E6Ai8gKEgd.png?imageslim" alt="mark" /></p>
+
+<p>从这里可以知道这个基因在染色体上是<strong>反义链(complement)</strong>。from：94547054；to：94415525</p>
+
+<p>选择 FASTA<br />
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/16GhbmfFbJ.png?imageslim" alt="mark" /></p>
+
+<p>启动子区域一般位于转录起始位点上游2000bp 和 下游 200bp 之间。如图填写需要的区域即可获取所需要的 promoter region。<br />
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/jGj4Kcd1I4.png?imageslim" alt="mark" /></p>
+
+<h2 id="ensemble-查找基因-promoter-region">Ensemble 查找基因 promoter region</h2>
+
+<p>在 ensemble 上查找就简单许多了。首先在 ensemble 搜索需要查找的基因，记得选择物种。<br />
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/lLbh2iJk0j.png?imageslim" alt="mark" /></p>
+
+<p>在弹出框中设置如下：<br />
+<img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/aFBb4mkbh9.png?imageslim" alt="mark" /></p>
+
+<p>直接可以显出需要的 promoter region。红色字体表示的是第一个外显子区域。</p>
+
+<p><img src="http://p3cyr0vss.bkt.clouddn.com/blog/180417/lBklGilgLK.png?imageslim" alt="mark" /></p>
+
+<p>基本上述两种方法就可以找到我们需要的 promoter region。</p>
+
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

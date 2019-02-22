@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/r/</link>
+    <description>Recent content in R on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Thu, 06 Dec 2018 21:35:29 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/r/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>10 个 dplyr 技巧</title>
+      <link>https://ZhangRuiQian778.github.io/post/10-%E4%B8%AA-dplyr-%E6%8A%80%E5%B7%A7/</link>
+      <pubDate>Thu, 06 Dec 2018 21:35:29 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/10-%E4%B8%AA-dplyr-%E6%8A%80%E5%B7%A7/</guid>
+      <description>&lt;p&gt;1.快速选择列&lt;br /&gt;
+可以先建一个包含列名的向量，然后通过 one_of() 或者 !! 来选择。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Karyotype plot</title>
+      <link>https://ZhangRuiQian778.github.io/post/karyotype-plot/</link>
+      <pubDate>Wed, 23 May 2018 17:53:13 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/karyotype-plot/</guid>
+      <description>&lt;p&gt;使用 ggplot2 画染色体核型图并用来展示 拷贝数变异图谱。我想到的是使用 ggplot2 中 geom_rect() 图层来实现这个功能。&lt;/p&gt;
+
+&lt;h2 id=&#34;data&#34;&gt;Data&lt;/h2&gt;
+
+&lt;p&gt;首先需要两个数据，一个是染色体信息，一个是拷贝数变异信息。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Principal Components Analysis</title>
+      <link>https://ZhangRuiQian778.github.io/post/principal-components-analysis/</link>
+      <pubDate>Tue, 22 May 2018 17:34:45 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/principal-components-analysis/</guid>
+      <description>&lt;p&gt;主成分分析是一种无监督方法。PCA 降低了数据集的维度，通过少量变量来解释尽可能多的变异。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

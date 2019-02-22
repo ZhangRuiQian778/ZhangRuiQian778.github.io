@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Jupyter notebook 安装配置多语言环境 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="Jupyter notebook 安装配置多语言环境 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-12-11T10:08:22&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-12-11T10:08:22&#43;08:00">
+        
+    <meta name="description" content="Jupyter notebook 安装配置多语言环境">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/jupyter-notebook-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%A4%9A%E8%AF%AD%E8%A8%80%E7%8E%AF%E5%A2%83/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Jupyter notebook 安装配置多语言环境</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年12月11日
+                            10:08
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#启动-jupyter">启动 Jupyter</a></li>
+<li><a href="#添加多语言环境">添加多语言环境</a></li>
+<li><a href="#后台运行">后台运行</a></li>
+<li><a href="#参考">参考</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <p>python 是通过 Anaconda 安装的，想在一台服务器上远程使用 jupyter notebook 并且把 R 语言也加进去。</p>
+
+<h2 id="启动-jupyter">启动 Jupyter</h2>
+
+<p>python 版本是 2.7 ，Jupyter notebook 也是安装 Anaconda 自带的。正常来说直接 <code>jupyter notebook</code> 即可启动，但是我遇到一点麻烦。</p>
+
+<pre><code>$ jupyter notebook 
+The Jupyter HTML Notebook.
+
+这将启动一个基于tornado的HTML笔记本服务器，它提供一个html5/
+javascript笔记本客户端。
+
+Traceback (most recent call last):
+  File &quot;/home/lab401_D/anaconda2/envs/T7810/bin/jupyter-notebook&quot;, line 11, in &lt;module&gt;
+    sys.exit(main())
+  File &quot;/home/lab401_D/anaconda2/envs/T7810/lib/python2.7/site-packages/jupyter_core/application.py&quot;, line 266, in launch_instance
+    return super(JupyterApp, cls).launch_instance(argv=argv, **kwargs)
+  File &quot;/home/lab401_D/anaconda2/envs/T7810/lib/python2.7/site-packages/traitlets/config/application.py&quot;, line 659, in launch_instance
+    app.initialize(argv)
+  File &quot;&lt;decorator-gen-7&gt;&quot;, line 2, in initialize
+  File &quot;/home/lab401_D/anaconda2/envs/T7810/lib/python2.7/site-packages/traitlets/config/application.py&quot;, line 91, in catch_config_error
+    app.print_help()
+  File &quot;/home/lab401_D/anaconda2/envs/T7810/lib/python2.7/site-packages/traitlets/config/application.py&quot;, line 387, in print_help
+    self.print_subcommands()
+  File &quot;/home/lab401_D/anaconda2/envs/T7810/lib/python2.7/site-packages/traitlets/config/application.py&quot;, line 379, in print_subcommands
+    print(os.linesep.join(lines))
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xe5 in position 4: ordinal not in range(128)
+(base) 
+</code></pre>
+
+<p>这是一个编码问题，在出问题的脚本里面添加如下并保存。</p>
+
+<pre><code>import sys
+reload(sys)
+sys.setdefaultencoding(&quot;utf-8&quot;)
+</code></pre>
+
+<p>重新运行后依然报错：</p>
+
+<pre><code>Examples
+--------
+
+    jupyter notebook                       # start the notebook
+    jupyter notebook --certfile=mycert.pem # use SSL/TLS certificate
+    jupyter notebook password              # enter a password to protect the server
+
+[C 06:11:13.045 NotebookApp] Bad config encountered during initialization:
+[C 06:11:13.046 NotebookApp] Could not decode '\xe6\x9c\xaa\xe5\x91\xbd\xe5\x90\x8d' for unicode trait 'untitled_notebook' of a LargeFileManager instance.
+(base) 
+
+</code></pre>
+
+<p>还是编码问题，对中文的支持不好，使用如下命令运行：
+<code>LANG=zn jupyter notebook</code></p>
+
+<p>运行成功</p>
+
+<pre><code>$ LANG=zn jupyter notebook
+[I 06:13:05.492 NotebookApp] JupyterLab extension loaded from /home/lab401_D/anaconda2/envs/T7810/lib/python2.7/site-packages/jupyterlab
+[I 06:13:05.492 NotebookApp] JupyterLab application directory is /home/lab401_D/anaconda2/envs/T7810/share/jupyter/lab
+[I 06:13:05.495 NotebookApp] Serving notebooks from local directory: /home/lab401_D/bio-software
+[I 06:13:05.495 NotebookApp] The Jupyter Notebook is running at:
+[I 06:13:05.495 NotebookApp] http://localhost:8888/
+[I 06:13:05.495 NotebookApp] No web browser found: could not locate runnable browser.
+[I 06:13:05.495 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+</code></pre>
+
+<p>Control-C 关闭之后进行一些配置。<br />
+1. 设置密码<br />
+<code>jupyter notebook password</code></p>
+
+<ol>
+<li>配置文件<br />
+<code>jupyter notebook --generate-config</code> 如果没有配置文件，这个命令可以生成。<br /></li>
+</ol>
+
+<pre><code>vim $HOME/.jupyter/jupyter_notebook_config.json
+#主要修改如下几个配置  
+c.NotebookApp.ip='192.168.1.2'    #因为是要远程访问，这里把 IP 设置为服务器 IP ,默认是127.0.0.1
+c.NotebookApp.notebook_dir = '$HOME/jupyter_data' 本地访问目录
+c.NotebookApp.open_browser = False    #启动时不再自动打开浏览器，服务器上也没有浏览器
+c.NotebookApp.port = 9999    #访问端口
+</code></pre>
+
+<h2 id="添加多语言环境">添加多语言环境</h2>
+
+<p>现在打开 jupyter notebook 后只有 python2 一个环境，python2 是服务器上软件运行的环境，平时脚本用 python3 多一些，所以需要再把 python3 的内核加上。<br />
+这里也只说明使用 Anaconda 的方法。<br />
+1. 创建一个 python3 的环境<br />
+<code>conda create -m py37 python=3.7</code>
+2.激活 python3 环境<br />
+<code>source activate py37</code><br />
+3. 在 py 37 环境中安装 kernel<br />
+<code>conda install ipykernel</code><br />
+4. 退出环境，为 jupyter notebook 添加新内核</p>
+
+<pre><code>conda deactivate 
+
+jupyter kernelspec install --user /home/lab401_D/.local/share/jupyter/kernels/python3
+
+jupyter kernelspec list
+Available kernels:
+  python3    /home/lab401_D/.local/share/jupyter/kernels/python3
+  python2    /home/lab401_D/anaconda2/envs/T7810/share/jupyter/kernels/python2
+
+</code></pre>
+
+<p>再次打开 Jupyter notebook 之后就可以在 <em>NEW</em> 里面找到 python3 选项了。<br />
+Jupyter 同样也支持其他语言，这里我再添加一个 R。<br />
+安装 R 就更简单了：<br />
+<code>conda install r-essentials</code><br />
+不需要其他操作，安装完成后直接运行同样可以看到多了一个 R。</p>
+
+<h2 id="后台运行">后台运行</h2>
+
+<p><code>nohup jupyter notebook &gt;.jupyter/jupyter_notebook.log 2&gt;&amp;1 &amp;</code><br />
+PID ,用来杀死进程<br />
+[1] 128749<br />
+查看日志<br />
+<code>tail -f .jupyter/jupyter_notebook.log</code></p>
+
+<h2 id="参考">参考</h2>
+
+<p>1.<a href="https://github.com/jupyter/notebook/issues/2789#issuecomment-338380336">Add Chinese translation</a><br />
+2.<a href="https://stackoverflow.com/questions/28831854/how-do-i-add-python3-kernel-to-jupyter-ipython">How do I add python3 kernel to jupyter (IPython)</a><br />
+3.<a href="https://zhuanlan.zhihu.com/p/33358809">linux上安装anaconda3并启用jupyter notebook远程服务的快速搭建指导</a><br />
+4.<a href="https://zhuanlan.zhihu.com/p/20226040">如何在云端服务器运行Jupyter Notebook？</a></p>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/linux">Linux</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

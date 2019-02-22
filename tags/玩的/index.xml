@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>玩的 on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/%E7%8E%A9%E7%9A%84/</link>
+    <description>Recent content in 玩的 on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 08 Aug 2018 11:41:35 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/%E7%8E%A9%E7%9A%84/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>斐讯N1盒子刷机</title>
+      <link>https://ZhangRuiQian778.github.io/post/%E6%96%90%E8%AE%AFn1%E7%9B%92%E5%AD%90%E5%88%B7%E6%9C%BA/</link>
+      <pubDate>Wed, 08 Aug 2018 11:41:35 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/%E6%96%90%E8%AE%AFn1%E7%9B%92%E5%AD%90%E5%88%B7%E6%9C%BA/</guid>
+      <description>开始是在 YouTube 上一个博主的 N1 盒子视频，他将挖矿的 N1 盒子刷固件成一个电视盒子。N1 挖矿收益如何我不关心，而且现在斐讯风雨飘摇，还去挖矿可能收益不够电费。但是这个盒子能够刷成电视盒子就显示出高性价比。在转转入手一台，拿到手就开始刷机。 盒子的版本是 V2.22，所以需要先降级才能刷机。
+降级  连接网线、HDMI、双公头 USB 、鼠标、电源； 开机后鼠标连续点击版本号位置后会显示 打开abd； 点击 连接盒子.bat，输入盒子 IP 地址； 点击 查询串号.bat。如果显示一个串号说明连接成功； 点击 降级.bat。 如果每个报错说明降级完毕； 点击 降级完毕.bat后退出。  刷机 降级完成后即可进行刷机，教程上写的比较简单。打开 usb burning tool — 导入固件 — 开始线刷。但是在实际操作中我还是遇到一些麻烦。
+下载 USB Burning Tool 并安装。最后会让安装驱动，这个必须安装。但是有的电脑还是不能识别硬件，所以手动添加过时硬件以方便检测硬件。
+添加过时硬件  打开设备管理器； 随便点击一个设备，然后点击操作后选择添加过时硬件；
+ 选择 安装我手动从列表选择的硬件(高级)(M)；
+ 选择常见硬件类型 libusb-win32 Usb Devices；
+ 选择 worldCup Device；
+ 一路下一步完成。
+  完成上面再去刷机的时候就能发现新硬件了。正常刷机的时候我们会在 libusb-win32 Usb Devices 下有两个 WorldCup Device 。</description>
+    </item>
+    
+  </channel>
+</rss>

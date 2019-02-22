@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Perl5 模板库问题 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="Perl5 模板库问题 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-08-27T23:04:58&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-08-27T23:04:58&#43;08:00">
+        
+    <meta name="description" content="Perl5 模板库问题">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/perl5-%E6%A8%A1%E6%9D%BF%E5%BA%93%E9%97%AE%E9%A2%98/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Perl5 模板库问题</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年8月27日
+                            23:04
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#解决问题过程">解决问题过程</a></li>
+<li><a href="#参考">参考</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <p>因为机器上通过不同方式安装了不同版本的 perl5 ，噩梦的开始是在我使用 FEELnc 软件的时候，机器上用的是 perl v5.26.2 但是还存有 perl v5.22.0。在使用这款用 perl 编写的软件时候发现很多模块不能使用，按照提示也不能安装在 perl v5.26.2 上。</p>
+
+<pre><code>Possible precedence issue with control flow operator at /home/anaconda3/lib/site_perl/5.26.2/Bio/DB/IndexedBase.pm line 845.
+Can't locate ExtractCdnaOrf.pm in @INC (you may need to install the ExtractCdnaOrf module) (@INC contains: /home/anaconda3/lib/site_perl/5.26.2/x86_64-linux-thread-multi /home/lab410/anaconda3/lib/site_perl/5.26.2 /home/anaconda3/lib/5.26.2/x86_64-linux-thread-multi /home/anaconda3/lib/5.26.2 .) at /homeanaconda3/bin/FEELnc_codpot.pl line 27.
+BEGIN failed--compilation aborted at /home/anaconda3/bin/FEELnc_codpot.pl line 27.
+
+</code></pre>
+
+<p>但是搜索这些模块文件在 v5.22.0 对应的 lib 文件库中存在，当程序在模块库对应的文件夹能够正常运行。期间尝试过设置 @INC 和 perl5lib 环境变量，但是设置完成后出现新的问题：*ListUtil.c: loadable library and perl binaries are mismatched (got handshake key 0xdb00080, needed 0xdb80080)*。<br />
+最终我只能用最笨的办法，不断的将 perl v5.26.2 模板库中缺失的文件从  v5.22.0 库中拷贝过来。下面是我拷贝的文件：<br />
+Debconf;Intersect.pm；ExtractFromFeature.pm；StringUtils.pm；ExtractFromHash.pm；Orf.pm；RandomForest.pm；ExtractCdnaOrf.pm；RNAshuffle.pm<br />
+如果以后出现什么问题考虑是否这些拷贝的文件导致。</p>
+
+<h2 id="解决问题过程">解决问题过程</h2>
+
+<ol>
+<li>发现不能安装指定 Perl 模块，使用中科大的镜像源并升级
+修改~/.cpan/CPAN/MyConfig.pm文件，将中科大镜像地址——<em><a href="http://mirrors.ustc.edu.cn/CPAN/">http://mirrors.ustc.edu.cn/CPAN/</a></em> 填入urllist对应的值。<br />
+修改完成后进入 CPAN，通过 reload index 和 reload cpan 更新。<br />
+<code>
+cpan&gt; reload idnex
+cpan&gt; reload cpan
+</code></li>
+<li>替换新版本 perl<br />
+<code>
+sudo rm /usr/bin/perl 
+sudo ln -s ~/anaconda3/bin/perl /usr/bin/perl
+</code></li>
+<li>更改 @INC<br /></li>
+</ol>
+
+<p>更改 PERL5LIB ，可以直接修改环境变量文件或者命令行临时修改。但是我使用这个方法报错：*ListUtil.c: loadable library and perl binaries are mismatched (got handshake key 0xdb00080, needed 0xdb80080)*。我目前没有解决办法。</p>
+
+<pre><code>#s输入命令
+export PERL5LIB=/home/foobar/code
+#修改环境变量文件
+PERL5LIB=/home/path/lib:/usr/another/path/lib; export PERL5LIB
+</code></pre>
+
+<p>在运行命令的时候添加参数</p>
+
+<pre><code>#是大写的 I
+perl -I /home/path/lib -I /usr/another/lib script.pl
+</code></pre>
+
+<p>在程序脚本中添加 use lib 指定使用的 module path 。</p>
+
+<pre><code>use lib '/home/foobar/code';
+use My::Module;
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
+<ol>
+<li><a href="http://coolnull.com/2595.html">perl模块安装及更新源</a><br /></li>
+<li><a href="https://tw.perlmaven.com/how-to-change-inc-to-find-perl-modules-in-non-standard-locations">如何更改 @INC 來找到不位在標準目錄的 Perl 模組</a><br /></li>
+<li><a href="http://bloodsam.blogspot.com/2010/10/perl-inc.html">PERL 的 @INC 修改</a></li>
+</ol>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/linux">linux</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

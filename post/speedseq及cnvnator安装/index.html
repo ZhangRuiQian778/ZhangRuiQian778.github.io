@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Speedseq及CNVnator安装 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="Speedseq及CNVnator安装 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2018-04-23T16:40:50&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2018-04-23T16:40:50&#43;08:00">
+        
+    <meta name="description" content="Speedseq及CNVnator安装">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/speedseq%E5%8F%8Acnvnator%E5%AE%89%E8%A3%85/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Speedseq及CNVnator安装</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2018年4月23日
+                            16:40
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#install">Install</a></li>
+<li><a href="#安装插件-cnvtator">安装插件 CNVtator</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            
+
+<p><a href="https://github.com/hall-lab/speedseq">SpeedSeq</a> 是一个开源的基因组分析平台，能够快速完成全基因组数据的上游分析。SpeedSeq 包含四个模块：<br />
+* speedseq align  - Process paired-end FASTQ sequences to produce a duplicate-marked, sorted, indexed BAM file that can be processed with other SpeedSeq modules.
+* speedseq var - Run FreeBayes one or more BAM files
+* speedseq somatic  - Run FreeBayes on a tumor/normal pair of BAM files
+* speedseq sv - Run LUMPY on one or more BAM files, with optional breakend genotyping and read-depth calculation.
+* speedseq realign - Realign from a BAM file.
+<!-- more -->
+并且软件还整合了 variant effect predictor(VEP) 和 CNVnator 两款软件，这也是我选择它的原因，这样就可以省去一些软件安装的麻烦。但没想到最大的麻烦就出在安装 CNVnator 的过程中。</p>
+
+<h2 id="install">Install</h2>
+
+<p>Speedseq 软件包直接 git clone 就可以，但是它还包含了很多的子模块，全部下载完大概是 300MB 。众所周知国内下载 Github 非常慢，我只好用位于国外的服务器下载完成后再传回本地，否则不知道要下载到猴年马月。</p>
+
+<pre><code>git clone --recursive https://github.com/hall-lab/speedseq
+cd speedseq
+sudo make
+
+# test example script
+cd example
+./run_speedseq
+</code></pre>
+
+<p>如果没有报错并生成如下文件即代表软件安装完成：
+* example.bam
+* example.discordants.bam
+* example.splitters.bam
+* example.vcf.gz
+* example.sv.vcf.gz</p>
+
+<p>在这里我遇到第一个错误 。软件没有找到 python2.7 的 pysam 模块。因为我使用的 Anaconda ，所以在 SpeedSeq 中默认路径并没有指向实际 python2.7 的路径。修改 <code>speeseq/bin/speedseq.config</code> 文件中 #general 下的 PYTHON 路径即可。<br />
+第二个错误在运行到 speedseq sv 步骤的时候报出，未找到 Sambamba 或者 Samtools。解决方法和上面类似，原来的 speedseq.config 文件中没有设置 Samtools 的路径，把路径添加上即可。 speedseq 的子模块中包含了 samtools 软件，路径为：<code>speedseq/src/samtools-1.3.1/samtools</code> 。</p>
+
+<h2 id="安装插件-cnvtator">安装插件 CNVtator</h2>
+
+<p>Speedseq 本身已经整合了拷贝数变异检测软件 LUMPY， 算法整合 split reads 和 reads pairs 两种 features 来分析拷贝数变异，它也可以和 CNVnator 配合增加 reads depth 这种方法以提高灵敏度和准确性。而在 Speedseq 中需要单独编译 CNVnator 软件，CNVtator 又依赖 <a href="https://root.cern.ch/">ROOT</a>—这就是坑的开始&hellip;</p>
+
+<p>首先放出 Speedseq 给出的安装方法：</p>
+
+<pre><code>1. Install the ROOT package
+curl -OL ftp://root.cern.ch/root/root_v5.34.20.source.tar.gz
+tar -zxvf root_v5.34.20.source.tar.gz
+cd root
+./configure --prefix=$PWD
+make
+2. Source thisroot.sh
+source /pathto/root/bin/thisroot.sh
+3. Compile CNVnator from the SpeedSeq directory
+cd $SPEEDSEQ_DIR
+make cnvnator
+4. Before running SpeedSeq, you'll need to add the following line to speedseq.config or your .bashrc file. (Substitute the actual path to thisroot.sh on your system)
+source /pathto/root/bin/thisroot.sh
+</code></pre>
+
+<p>如果编译 CNVnator 没有报错那么恭喜你下面的内容不用看了。</p>
+
+<p>而我遇到了下面的错误：</p>
+
+<blockquote>
+<p>WARNING: CNVnator not compiled because the ROOT package is not installed. Please see the README for instructions on manually installing ROOT.</p>
+</blockquote>
+
+<p>Speedseq 软件给出的解决建议是：<br />
+&gt;This indicates that the ROOT package has not been installed, or the $ROOTSYS variable has not been set. See the CNVnator repository for details.</p>
+
+<p>而我机器上 ROOT package 已经安装成功并可以运行。在多次尝试失败后我重新安装了 ROOT 。<a href="https://leeyeel.github.io/2017/07/01/root-install/">cern root 安装过程</a> 这是 ROOT6 的安装方法，它使用 cmake 的方式安装。在 CNVnator 的问答页面上看到作者提到他已经不再对 ROOT5 提供支持，所以我想安装最新版的 ROOT 可能会解决问题。安装过程后设置<em>~/.bashrc</em> 文件，</p>
+
+<pre><code>export ROOTSYS=/root6-build:$ROOTSYS
+export PATH=/home/root6-build/:$PATH
+source /root6-build/bin/thisroot.sh
+export LD_LIBRARY_PATH=/root6-build/lib:$LD_LIBRARY_PATH
+</code></pre>
+
+<p>情况依然是 ROOT 运行正常，而 CNVnator 就是找不到 ROOT package。接下来我转而直接编译 CNVnator 验证是否 Speedseq 有问题。下载 <a href="https://github.com/abyzovlab/CNVnator">CNVnator</a> 源码包后首先需要编译完成 Samtools ，然后才能编译 CNVnator，报错：<br />
+ &gt;g++ -O3 -std=c++11 -DCNVNATOR_VERSION=\&ldquo;v0.3.3\&rdquo; -fopenmp -I/include      -Isamtools -Isamtools/htslib-1.3.1 -c cnvnator.cpp -o obj/cnvnator.o
+In file included from cnvnator.cpp:14:0:
+HisMaker.hh:11:20: fatal error: TFrame.h: 没有那个文件或目录</p>
+
+<p>报错的原因同样是未找到 ROOT package 不能完成编译过程。(到这里我安装 Speed seq 已经用掉了一天的时间&hellip; )</p>
+
+<p><a href="https://github.com/abyzovlab/CNVnator/issues/59">Issue installing CNVnator</a>    <a href="https://github.com/abyzovlab/CNVnator/issues/13">CNVnatorv0.3.2, root 6.04.10, Ubuntu 14.04, and make</a>    <a href="https://github.com/abyzovlab/CNVnator/issues/46">How to compile</a>   这是搜索到的关于上述问题的一些问答。其中一个网友提到他最终使用了 <a href="https://github.com/indraniel/cnvnator-packager">CNVnator packager</a> 成功安装 CNVnator 。这个库整合了安装 CNVnator 需要的软件并且能够构建 debian packages。使用这个方法编译的 CNVnator 正常工作了。CNVnator 默认被安装在 <code>/opt/cnvnator-0.3.2</code> ， 环境变量的设置位于 <code>/usr/local/bin/root</code>。 但是 ROOT 还是不能在编译 CNVnator 的时候被识别，期间经过多次改变环境变量的设置均不能成功在 Speedseq 下编译 CNVnator。</p>
+
+<p>我通过修改 <code>speedseq.config</code> 文件解决了第一个问题，那么我既然已经有能够正常工作的 CNVnator 那是不是可以跳过编译步骤直接使用软件呢？我尝试将 <code>speeseq/bin/speedseq.config</code> 文件中的 CNVNATOR 变量改为能正常工作 CNVnator 的路径后测试 example， 软件正常工作了。</p>
+
+<blockquote>
+<p>#CNVnator<br />
+CNVNATOR_WRAPPER=/home/lab410/bio-software/speedseq//bin/cnvnator_wrapper.py<br />
+CNVNATOR=/usr/local/bin/cnvnator<br />
+ANNOTATE_RD=/home/lab410/bio-software/speedseq//bin/annotate_rd.py<br />
+CNVNATOR_CHROMS_DIR=/home/lab410/bio-software/speedseq//annotations/cnvnator_chroms</p>
+</blockquote>
+
+<p>最终还是没有解决 CNVnator 编译过程中找不到 ROOT package 的问题，但好歹绕一点弯路使软件能够正常工作了。如果有大神知道怎么解决上面的问题希望能够告诉我解决方法，谢谢。Email：zhangruqianv@gmail.com</p>
+
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="/tags/genome">Genome</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

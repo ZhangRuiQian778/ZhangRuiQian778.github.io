@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rna Seq on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/rna-seq/</link>
+    <description>Recent content in Rna Seq on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Tue, 11 Sep 2018 19:36:55 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/rna-seq/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>SRA数据库上传流程</title>
+      <link>https://ZhangRuiQian778.github.io/post/sra%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8A%E4%BC%A0%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Tue, 11 Sep 2018 19:36:55 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/sra%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8A%E4%BC%A0%E6%B5%81%E7%A8%8B/</guid>
+      <description>&lt;p&gt;SRA 数据上传主要分为：获取 bioproject accession、biosample accession 和 SRA 测序数据上传。大部分操作在网页上就可以完成，其中两个 Excel 表格的时候需要注意填写和格式问题。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>LncRNA 分析实战(一)</title>
+      <link>https://ZhangRuiQian778.github.io/post/lncrna-%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%E4%B8%80/</link>
+      <pubDate>Fri, 17 Aug 2018 12:49:05 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/lncrna-%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%E4%B8%80/</guid>
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+
+&lt;p&gt;lncRNA 分析过程可以分为：质量控制；参考基因组比对；转录本拼装；LncRNA 鉴定；LncRNA 靶基因预测；LncRNA 定量；筛选差异 LncRNA 等。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>鉴别 RNA-seq 是否为链特异文库</title>
+      <link>https://ZhangRuiQian778.github.io/post/%E9%89%B4%E5%88%AB-rna-seq-%E6%98%AF%E5%90%A6%E4%B8%BA%E9%93%BE%E7%89%B9%E5%BC%82%E6%96%87%E5%BA%93/</link>
+      <pubDate>Tue, 24 Jul 2018 16:46:34 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/%E9%89%B4%E5%88%AB-rna-seq-%E6%98%AF%E5%90%A6%E4%B8%BA%E9%93%BE%E7%89%B9%E5%BC%82%E6%96%87%E5%BA%93/</guid>
+      <description>&lt;p&gt;最近从公司返回一批 lncRNA 测序数据。一般来说 lncRNA-seq 通常采用链特异建库的方式。链特异文库的特性使我们在具体处理过程中需要和普通文库区别开来。具体体现在 map reference genome 和 gene expression summarization 两步上。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Remove rRNA  Sequences with SortMeRNA</title>
+      <link>https://ZhangRuiQian778.github.io/post/remove-rrna-sequences-with-sortmerna/</link>
+      <pubDate>Mon, 07 May 2018 17:34:49 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/remove-rrna-sequences-with-sortmerna/</guid>
+      <description>核糖体 RNA 占总 RNA 的比例在 95% 以上，虽然在 RNA-seq 建库步骤会通过实验去除 rRNA， 但是考虑到这部分 RNA 占比太高如果在数据处理中不将 rRNA sequences 去除势必造成比对率低等影响。
+通过其他的软件我们已经将 low quality sequences 和 adapter 去除，接下来我选择 SortMeRNA 这款软件去除测序数据中存在的 rRNA sequences. &amp;gt;SortMeRNA is a program tool for filtering, mapping and OTU-picking NGS reads in metatranscriptomic and metagenomic data. The core algorithm is based on approximate seeds and allows for fast and sensitive analyses of nucleotide sequences. The main application of SortMeRNA is filtering ribosomal RNA from metatranscriptomic data.</description>
+    </item>
+    
+  </channel>
+</rss>

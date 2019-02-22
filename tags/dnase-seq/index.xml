@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dnase Seq on Juichien&#39;s blog</title>
+    <link>https://ZhangRuiQian778.github.io/tags/dnase-seq/</link>
+    <description>Recent content in Dnase Seq on Juichien&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Tue, 23 Oct 2018 18:04:46 +0000</lastBuildDate>
+    
+	<atom:link href="https://ZhangRuiQian778.github.io/tags/dnase-seq/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>DNase-seq 分析实战</title>
+      <link>https://ZhangRuiQian778.github.io/post/dnase-seq-%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98/</link>
+      <pubDate>Tue, 23 Oct 2018 18:04:46 +0000</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/dnase-seq-%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98/</guid>
+      <description>&lt;p&gt;最近喜欢看一些表观遗传方面的东西，像 ChiP-seq、DNase-seq 和 ATAC-seq 等技术现在应用也比较广泛，借着兴趣把这些东西都学习一下。首先做 DNase-seq 实战系列，以后会把其他技术的分析学习整理后发上来。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
