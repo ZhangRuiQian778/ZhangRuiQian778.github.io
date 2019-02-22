@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>使用 snakemake 编写 RNA seq 流程 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="使用 snakemake 编写 RNA seq 流程 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-02-22T22:50:27&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-02-22T22:50:27&#43;08:00">
+        
+    <meta name="description" content="使用 snakemake 编写 RNA seq 流程">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/%E4%BD%BF%E7%94%A8-snakemake-%E7%BC%96%E5%86%99-rna-seq-%E6%B5%81%E7%A8%8B/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">使用 snakemake 编写 RNA seq 流程</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年2月22日
+                            22:50
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#创建一个单独的文件夹存放测序数据">创建一个单独的文件夹存放测序数据</a></li>
+<li><a href="#为-star-比对步骤准备-index">为 STAR 比对步骤准备 index</a></li>
+<li><a href="#编写-snakefile">编写 snakefile</a></li>
+<li><a href="#第一个任务-fastqc">第一个任务：fastqc</a></li>
+<li><a href="#第二个任务-fastp">第二个任务：fastp</a></li>
+<li><a href="#第三个任务-star">第三个任务：STAR</a></li>
+<li><a href="#第四个任务-featurecounts">第四个任务：featureCounts</a></li>
+<li><a href="#总结">总结</a></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <p>学习生信两年多了，自己也积累了一些测序数据分析流程，后来数据越来越多就有把流程自动化以方便分析工作。开始是将流程写成 shell 脚本，但是有时候还需要根据不同的数据去更改一些步骤的参数，所以每次用还是要检查一下脚本。后来发现 <a href="https://snakemake.readthedocs.io/en/stable/#">snakemake</a> 流程管理工具，它完全能够满足我目前的需求。<br />
+我以搭建转录组流程为例子介绍如何使用 snakemake 搭建适合你的流程。</p>
+
+<h2 id="创建一个单独的文件夹存放测序数据">创建一个单独的文件夹存放测序数据</h2>
+
+<p>创建名为 <strong>input</strong> 的文件夹存放转录组测序数据，我使用的数据如下：</p>
+
+<p>s1-1_RRL18212-V_1.fq.gz——Control(forward)<br />
+s1-1_RRL18212-V_2.fq.gz——Control(reverse)<br />
+s1-2_RRL18214-V_1.fq.gz——Treated(forward)<br />
+s1-2_RRL18214-V_2.fq.gz——Treated(reverse)</p>
+
+<pre><code>input
+├── s1-1_RRL18212-V_1.fq.gz
+├── s1-1_RRL18212-V_2.fq.gz
+├── s1-2_RRL18214-V_1.fq.gz
+└── s1-2_RRL18214-V_2.fq.gz
+</code></pre>
+
+<h2 id="为-star-比对步骤准备-index">为 STAR 比对步骤准备 index</h2>
+
+<p>我们需要把测序数据比对到小鼠参考基因组上，需要先下载小鼠（GRCm38.p6）参考基因组文件并使用 STAR 的 genomeGenerate 创建 index 。</p>
+
+<pre><code>mkdir genome
+wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M20/GRCm38.p6.genome.fa.gz
+wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M20/gencode.vM20.annotation.gtf.gz
+pigz -d GRCm38.p6.genome.fa.gz gencode.vM20.annotation.gtf.gz
+
+STAR \
+--runMode genomeGenerate \
+--genomeDir star_index \
+--genomeFastaFiles genome/GRCm38.p6.genome.fa \
+--sjdbGTFfile annotation/gencode.vM20.annotation.gtf \
+--runThreadN 4
+</code></pre>
+
+<h2 id="编写-snakefile">编写 snakefile</h2>
+
+<p>创建一个文件名为 <strong>snakefile</strong> 的文件，我们的流程主要编写在这个文件里。<br />
+我们先看一个基础 snakefile 是什么样子的：</p>
+
+<pre><code>rule bwa_map:
+    input:
+        &quot;data/genome.fa&quot;,
+        &quot;data/samples/A.fastq&quot;
+    output:
+        &quot;mapped_reads/A.bam&quot;
+    shell:
+        &quot;bwa mem {input} | samtools view -Sb - &gt; {output}&quot;
+</code></pre>
+
+<p>每一个 <em>rule</em> 表示不同的任务，需要通过 <em>input</em> 和 <em>output</em> 指定任务需要的输入文件和会产生的输出文件，<em>run</em> 就指明该任务的将要运行的命令行。</p>
+
+<h2 id="第一个任务-fastqc">第一个任务：fastqc</h2>
+
+<p>第一个任务我们检测测序数据质量，按照 snakemake 规则如下写法：</p>
+
+<pre><code>rule fastqc:
+    input:
+        &quot;input/{sample}_1.fq.gz&quot;,
+        &quot;input/{sample}_2.fq.gz&quot;
+    output:
+        &quot;results/1_initial_qc/{sample}/{sample}_1_fastqc.zip&quot;,
+        &quot;results/1_initial_qc/{sample}/{sample}_2_fastqc.zip&quot;,
+        &quot;results/1_initial_qc/{sample}/{sample}_1_fastqc.html&quot;,
+        &quot;results/1_initial_qc/{sample}/{sample}_2_fastqc.html&quot;
+    log:
+        &quot;log/{sample}_fastqc&quot;
+    shell:
+        &quot;&quot;&quot;
+        fastqc -o results/1_initial_qc/{wildcards.sample} --noextract {input[0]} {input[1]} 2&gt; {log}
+        &quot;&quot;&quot;
+</code></pre>
+
+<p>因为是双端测序数据，我每次运行将一个样品的两端数据同时检测。可以发现在 input 和 output 里我都使用了 {sample} 字样，这是snakemake 中的通配方式，比如 <code>input/{sample}_1.fq.gz</code> 就可以通配到：s1-1_RRL18212-V_1.fq.gz 和 s1-2_RRL18214-V_1.fq.gz 两个文件，这一点是 snakemake 的精髓，这样我们一行命令就能把所以样品都跑完流程。</p>
+
+<h2 id="第二个任务-fastp">第二个任务：fastp</h2>
+
+<p>对测序数据进行质量控制步骤，主要修剪一些接头序列和去除低质量 reads 。这里我一般使用 fastp 自动化完成这一步。</p>
+
+<pre><code>rule fastp:
+    input:
+        &quot;input/{sample}_1.fq.gz&quot;,
+        &quot;input/{sample}_2.fq.gz&quot;
+    output:
+        &quot;results/2_fastp_output/{sample}_1_good.fq.gz&quot;,
+        &quot;results/2_fastp_output/{sample}_2_good.fq.gz&quot;,
+        &quot;results/2_fastp_output/{sample}.html&quot;,
+        &quot;results/2_fastp_output/{sample}.json&quot;
+    log:
+        &quot;log/{sample}_fastp&quot;
+    shell:
+        &quot;&quot;&quot;
+        fastp -w 10 -h results/2_fastp_output/{wildcards.sample}.html -j results/2_fastp_output/{wildcards.sample}.json -i {input[0]} -I {input[1]} -o {output[0]} -O {output[1]} 2&gt; {log}
+        &quot;&quot;&quot;
+</code></pre>
+
+<p>仔细阅读 snakemake 的文档之后就会发现它的语法非常简单，并且有很强的阅读性。这个任务中需要对 shell 部分做一点解释。<br />
+首先，我想每个样品都设置有样品名的结果文件（html 和json），我使用 {wildcards.sample} 获得通配名。<br />
+其二，shell 命令里面需要两个设定两个输入和输出，这里和 python 中的切片类似，或者我们可以在 input 和 output 这一步骤就对文件进行命令，这样可读性更好，比如：</p>
+
+<pre><code>rule fastp:
+    input:
+        fwd:&quot;input/{sample}_1.fq.gz&quot;,
+        rev:&quot;input/{sample}_2.fq.gz&quot;
+    output:
+        fwwd:&quot;results/2_fastp_output/{sample}_1_good.fq.gz&quot;,
+        rev:&quot;results/2_fastp_output/{sample}_2_good.fq.gz&quot;,
+        &quot;results/2_fastp_output/{sample}.html&quot;,
+        &quot;results/2_fastp_output/{sample}.json&quot;
+    log:
+        &quot;log/{sample}_fastp&quot;
+    shell:
+        &quot;&quot;&quot;
+        fastp -w 10 -h results/2_fastp_output/{wildcards.sample}.html -j results/2_fastp_output/{wildcards.sample}.json -i {input[fwd]} -I {input[rev]} -o {output[fwd]} -O {output[rev]} 2&gt; {log}
+        &quot;&quot;&quot;
+</code></pre>
+
+<h2 id="第三个任务-star">第三个任务：STAR</h2>
+
+<p>完成质量控制部分后就可以进行数据比对这一步骤了，上一任务的输出文件是这一任务的输入文件，snakemake 利用不同任务之间文件的关系来自动理顺任务关系。</p>
+
+<pre><code>rule STAR:
+    input:
+        &quot;results/2_fastp_output/{sample}_1_good.fq.gz&quot;,
+        &quot;results/2_fastp_output/{sample}_2_good.fq.gz&quot;
+    output:
+        &quot;results/3_aligned_sequences/{sample}Aligned.sortedByCoord.out.bam&quot;,
+        &quot;results/3_aligned_sequences/{sample}Log.final.out&quot;,
+        &quot;results/3_aligned_sequences/{sample}Log.out&quot;
+    params:&quot;{sample}&quot;
+    log:
+        &quot;log/{sample}_STAR&quot;
+    shell:
+        &quot;&quot;&quot;
+        STAR --genomeDir {config[star_index]}  --readFilesCommand zcat --readFilesIn {input[0]} {input[1]} --runThreadN 10 \
+        --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts --outFileNamePrefix results/3_aligned_sequences/{params} 2&gt; {log}
+        &quot;&quot;&quot;
+</code></pre>
+
+<p>我在这个任务中使用了配置文件中的参数，在开始我没有说明这点，我们可以将软件运行参数单独存放在配置文件里，每次使用 snakemake 的时候只需要修改配置文件而不需要对主流程进行修改。<br />
+在snakefile 的开始要对配置文件进行声明<code>configfile:&quot;config.yaml&quot;</code>。<br />
+在这个任务中我还设置了 params ，我们可以将命令中的一些静态参数写在这里以提高易读性。在 rule 中的 params 可以直接在shell 中调用。</p>
+
+<h2 id="第四个任务-featurecounts">第四个任务：featureCounts</h2>
+
+<p>最后就要对各个样品进行定量了。</p>
+
+<pre><code>rule featureCounts:
+    input:
+        expand(&quot;results/3_aligned_sequences/{sample}Aligned.sortedByCoord.out.bam&quot;, sample=SAMPLES)
+    output:
+        &quot;results/4_final_counts/final_counts.txt&quot;,
+        &quot;results/4_final_counts/final_counts.txt.summary&quot;
+    log:
+        &quot;log/featurecounts.log&quot;
+    shell:
+        &quot;&quot;&quot; 
+        ls results/3_aligned_sequences/*bam | xargs featureCounts -a {config[gtf]} -o {output[0]} \
+        -T 5 -t exon -g gene_id 2&gt; {log}
+        &quot;&quot;&quot;
+</code></pre>
+
+<p>snakemake 另外一个很简便的地方就在于它将列表推导式简化为 <strong>expand</strong> 函数，比如这个任务中的 input 就会生成所有符合条件的 bam 文件。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>这只是使用 snakemake 编写的简单的流程，主要想记录下在学习 snakemake 中的几个知识点，snakemake 还有其他的一些使用技巧我会在日后其他的流程中慢慢总结。如果你有写生信分析流程的需要还是非常推荐这个工具，它还有很多高级技巧有待我细细挖掘。</p>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>

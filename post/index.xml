@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Juichien&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 18 Dec 2018 09:01:48 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 22 Feb 2019 22:50:27 +0800</lastBuildDate>
     
 	<atom:link href="https://ZhangRuiQian778.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用 snakemake 编写 RNA seq 流程</title>
+      <link>https://ZhangRuiQian778.github.io/post/%E4%BD%BF%E7%94%A8-snakemake-%E7%BC%96%E5%86%99-rna-seq-%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Fri, 22 Feb 2019 22:50:27 +0800</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/%E4%BD%BF%E7%94%A8-snakemake-%E7%BC%96%E5%86%99-rna-seq-%E6%B5%81%E7%A8%8B/</guid>
+      <description>&lt;p&gt;学习生信两年多了，自己也积累了一些测序数据分析流程，后来数据越来越多就有把流程自动化以方便分析工作。开始是将流程写成 shell 脚本，但是有时候还需要根据不同的数据去更改一些步骤的参数，所以每次用还是要检查一下脚本。后来发现 &lt;a href=&#34;https://snakemake.readthedocs.io/en/stable/#&#34;&gt;snakemake&lt;/a&gt; 流程管理工具，它完全能够满足我目前的需求。&lt;br /&gt;
+我以搭建转录组流程为例子介绍如何使用 snakemake 搭建适合你的流程。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Manjaro 安装配置备忘</title>
