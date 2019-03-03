@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Scallop和Salmon应用转录本定量分析 - Juichien&#39;s blog</title>
+    <meta property="og:title" content="Scallop和Salmon应用转录本定量分析 - Juichien&#39;s blog">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-03-03T10:01:27&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-03-03T10:01:27&#43;08:00">
+        
+    <meta name="description" content="Scallop和Salmon应用转录本定量分析">
+        
+    <meta name="author" content="Juichien">
+    <meta property="og:url" content="https://ZhangRuiQian778.github.io/post/scallop%E5%92%8Csalmon%E5%BA%94%E7%94%A8%E8%BD%AC%E5%BD%95%E6%9C%AC%E5%AE%9A%E9%87%8F%E5%88%86%E6%9E%90/">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="https://ZhangRuiQian778.github.io">
+                        Juichien&#39;s blog
+                    </a>
+                
+                
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="current" href="https://ZhangRuiQian778.github.io">博客</a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/archives/" title="归档">
+                        归档
+                    </a>
+                    
+                    <a  href="https://ZhangRuiQian778.github.io/about/" title="关于">
+                        关于
+                    </a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Scallop和Salmon应用转录本定量分析</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年3月3日
+                            10:01
+                        </date>
+                        <aside id="toc" class="dismissed">
+                            <span class="toc-title">目录 <a href="#" class="toc-dismiss"></a></span>
+                            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#scallop-部分">Scallop 部分</a></li>
+<li><a href="#salmon-部分">Salmon 部分</a>
+<ul>
+<li><a href="#构建转录本索引">构建转录本索引</a></li>
+<li><a href="#转录本定量">转录本定量</a></li>
+<li><a href="#输出文件格式">输出文件格式</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+                        </aside><div class="post-content">
+                            <p>这周帮别人分析了一个转录组数据，他的要求之一是计算每个样品的 relative copy number，然后我对这一要求有点疑问：mRNA-seq 可以做 copy number variation 是没有问题，那么如何测量 RNA copy numbers 以解释转录本时间维度的变化呢？首先是怎么对 copy numbers absolute measuring就对我有些难度，所以我选择通过 transcription abundance 来解释她想要解释的生物问题。所以对于 copy number 先放在一边，下周再对这个问题进行探究。</p>
+
+<p>kingsford group 在 2017 年发表的Salmon 是一款用来对转录本进行定量的工具，而 Scallop 是后面他们发表的用于组装转录本的工具，作者建议将这两个软件结合使用。先使用 Scallop 组装出新的转录本，合并转录本后使用 Salmon 进行转录本定量。</p>
+
+<h2 id="scallop-部分">Scallop 部分</h2>
+
+<ol>
+<li><p>STAR比对，首先将 reads mapping 到参考基因组上获得 bam 文件，这一步大家应该都能完成</p></li>
+
+<li><p>使用 scallop 将每个样品组装新的转录本</p>
+
+<pre><code>ls *bam |while read id 
+do 
+~/bio-software/scallop-0.10.3/scallop -i $id -o ${id%Aligned*}.gtf &amp;
+done
+</code></pre></li>
+
+<li><p>使用 Stringtie 将所以新组装的转录本合并</p>
+
+<pre><code>ls *gtf| xargs stringtie --merge -p 8 -G ~/REF_genome/Mouse/GRCm38.p5/gencode.vM15.annotation.gtf -o merged.gtf 
+</code></pre></li>
+
+<li><p>使用 gffcompare 对转录本进行评估</p>
+
+<pre><code>gffcompare -o gffall -r ~/REF_genome/Mouse/GRCm38.p5/gencode.vM15.annotation.gtf merged.gtf
+</code></pre></li>
+
+<li><p>使用官方文档中 gtfcuff 工具提取只在 scallop 组装得到的转录本</p>
+
+<pre><code>gtfcuff puniq gffall.merged.gtf.tmap merged.gtf ~/REF_genome/Mouse/GRCm38.p5/gencode.vM15.annotation.gtf unique.gtf
+</code></pre></li>
+
+<li><p>将特异转录本转为 fasta 格式，然后将这部分合并进参考转录本（注意：这里要使用<strong>参考转录本序列</strong>而不是参考基因组序列）</p></li>
+</ol>
+
+<pre><code>gffread unique.gtf -g ~/REF_genome/Mouse/GRCm38.p5/GRCm38.p5.genome.fa  -w unique.fa
+
+cat ~/REF_genome/Mouse/GRCm38.p5/GRCm38.p5.genome.fa unique.fa &gt; union.fa
+</code></pre>
+
+<h2 id="salmon-部分">Salmon 部分</h2>
+
+<p>Salmon 提供给两种量化模式：1. quai-mapping-based mode 需要构建索引并直接对 reads 进行处理；2. alignment-based mode 需要提供转录本序列文件和比对后经过排序的 BAM 文件。作者更推荐 quai-mapping-based mode，所以下面我只对 quai-mapping-based mode 进行介绍。</p>
+
+<h3 id="构建转录本索引">构建转录本索引</h3>
+
+<p>Salmon 能够快速定量的一个原因是使用 quasi-mappings ，虽然 Salmon 同时提供传统的基于 SMEM 对其映射方法但更推荐使用 quasi-mappings ，两种方法的构建索引方式也不同：</p>
+
+<pre><code>quasi-mapping 构建索引：salmon index -t union.fa -i all_merged_salmon_index --type quasi
+
+SMEM-mapping 构建索引：salmon index -t union.fa -i all_merged_salmon_index --type fmd
+</code></pre>
+
+<h3 id="转录本定量">转录本定量</h3>
+
+<pre><code>ls *fq.gz |while read id
+do 
+salmon quant -i /Scallop/all_merged_salmon_index -l IU -1 ${id%_*}_1.fq.gz -2 ${id%_*}_2.fq.gz -p 3 --numBootstraps 100 -o ../salmon/${id%_*}_quant  
+done
+</code></pre>
+
+<p>软件文档提供了参数的具体解释，这里需要注意的是 <strong>&ndash;libType</strong> 参数，首先不知道什么原因，&ndash;libType 必须放在 reads 文件前面程序才能正常运行，后面就不行。关于这个参数的设定可以参考<a href="https://salmon.readthedocs.io/en/latest/library_type.html">Fragment Library Types</a>，或者直接设置 <strong>&ndash;libType A</strong> 即自动检测即可。</p>
+
+<h3 id="输出文件格式">输出文件格式</h3>
+
+<p>通常我们只需要生成目录下的 <strong>quant.sf</strong> 文件，这是主要的定量文件，文件格式如下：</p>
+
+<pre><code>Name    Length  EffectiveLength TPM     NumReads
+ENSMUST00000193812.1|ENSMUSG00000102693.1|OTTMUSG00000049935.1|OTTMUST00000127109.1|RP23-271O17.1-001|RP23-271O17.1|1070|TEC|   1070    894.724 0.000000        0.000
+ENSMUST00000082908.1|ENSMUSG00000064842.1|-|-|Gm26206-201|Gm26206|110|snRNA|    110     19.145  0.000000        0.000
+ENSMUST00000162897.1|ENSMUSG00000051951.5|OTTMUSG00000026353.2|OTTMUST00000086625.1|AC157543.1-003|Xkr4|4153|processed_transcript|      4153    3977.724        0.000000        0.000
+ENSMUST00000159265.1|ENSMUSG00000051951.5|OTTMUSG00000026353.2|OTTMUST00000086624.1|AC157543.1-002|Xkr4|2989|processed_transcript|      2989    2813.724        0.333914        3.298
+
+</code></pre>
+
+<ul>
+<li>Name: 参考转录本序列中的 Tag</li>
+<li>Length: 参考转录本长度</li>
+<li>EffectiveLength: 转录本计算得到的有效长度</li>
+<li>TPM: 转录本相对丰度，以 TPM 为单位计算</li>
+<li>NumReads: 转录本定量估值
+<br /></li>
+</ul>
+
+<p>得到转录本定量文件后我们就可以继续下游的差异分析（待补充）等步骤了。</p>
+                        </div>
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    <div id="comments"><span class="widget-title">评论</span>
+  <script src="https://utteranc.es/client.js"
+          repo="ZhangRuiQian778/ZhangRuiQian778_hexo"
+          issue-term="pathname"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+  </script></div>
+
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        
+    
+<form id="search" method="POST" action="https://duckduckgo.com/">
+    
+    <input type="text" name="q" maxlength="255" placeholder="搜索...">
+    
+    <input type="hidden" name="sites" value="https://ZhangRuiQian778.github.io">
+    
+    <input type="hidden" name="kp" value="-2">
+    
+    <input type="hidden" name="kh" value="1">
+    
+    <input type="hidden" name="kl" value="wt-wt">
+    
+    <input type="hidden" name="kg" value="p">
+    
+    <input type="hidden" name="kaf" value="1">
+    
+    
+    <input type="hidden" name="k1" value="-1">
+
+    
+
+    
+    
+    <input type="hidden" name="k7" value="#ffffff">
+    
+    <input type="hidden" name="kj" value="#ffffff">
+    
+    <input type="hidden" name="ky" value="#eaeaea">
+    
+    <input type="hidden" name="kx" value="#6E7173">
+    
+    <input type="hidden" name="k8" value="#444">
+    
+    <input type="hidden" name="k9" value="#6E7173">
+    
+    <input type="hidden" name="kaa" value="#6E7173">
+    
+    <input type="hidden" name="kae" value="#6E7173">
+
+    
+    
+    <input type="hidden" name="ko" value="1">
+    
+    <input type="hidden" name="kt" value="n">
+    
+    <input type="hidden" name="ka" value="g">
+    
+    <input type="hidden" name="ks" value="l">
+    
+    <input type="hidden" name="kv" value="1">
+
+    <button type="submit" class="submit icon-search"></button>
+</form>
+
+
+
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+        <ul class="widget-list">
+            
+        </ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+      &copy; 2019 <a rel="nofollow" href="https://ZhangRuiQian778.github.io">Juichien&#39;s blog</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io">Hugo</a>.
+        <a rel="nofollow noreferer noopener" href="https://github.com/JokerQyou/maupassant-hugo">Theme</a> based on <a rel="nofollow noreferer noopener" href="https://github.com/pagecho/maupassant">maupassant</a>.
+    </div>
+</footer>
+
+
+<script type="text/javascript" src="/js/prism.js" async="true"></script>
+
+<script type="text/javascript" src="/js/app.js" defer></script>
+
+<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+
+
+</body>
+</html>
