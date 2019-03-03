@@ -160,12 +160,6 @@
   </url>
   
   <url>
-    <loc>https://ZhangRuiQian778.github.io/</loc>
-    <lastmod>2019-03-03T10:01:27+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://ZhangRuiQian778.github.io/tags/linux/</loc>
     <lastmod>2018-12-11T10:08:22+00:00</lastmod>
     <priority>0</priority>
@@ -198,6 +192,12 @@
   <url>
     <loc>https://ZhangRuiQian778.github.io/tags/</loc>
     <lastmod>2018-10-23T18:04:46+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZhangRuiQian778.github.io/</loc>
+    <lastmod>2019-03-03T10:01:27+08:00</lastmod>
     <priority>0</priority>
   </url>
   
