@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Vidotto&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Sun, 03 Mar 2019 10:01:27 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 21 Mar 2019 21:04:17 +0800</lastBuildDate>
     
 	<atom:link href="https://ZhangRuiQian778.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>单细胞 line plot</title>
+      <link>https://ZhangRuiQian778.github.io/post/%E5%8D%95%E7%BB%86%E8%83%9Eline-plot/</link>
+      <pubDate>Thu, 21 Mar 2019 21:04:17 +0800</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/%E5%8D%95%E7%BB%86%E8%83%9Eline-plot/</guid>
+      <description>&lt;h1 id=&#34;line-plot&#34;&gt;line_plot&lt;/h1&gt;
+
+&lt;p&gt;以曲线展示多个基因在时间序列上的表达变化趋势，这种表现形式常见于单细胞测序文章。比如下面这篇文章中的图，把基因进行聚类分为 4 个 clusters 并以热图的形式来可视化，然后对每个 cluster 包含的基因在不同时期的表达变化情况进行可视化也就是热图旁边的 line plot 。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Scallop 和 Salmon 应用转录本定量分析</title>
