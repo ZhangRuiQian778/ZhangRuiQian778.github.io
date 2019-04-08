@@ -17,9 +17,11 @@
       <pubDate>Mon, 08 Apr 2019 22:30:47 +0800</pubDate>
       
       <guid>https://ZhangRuiQian778.github.io/post/pheatmap%E9%A2%9C%E8%89%B2%E5%8C%BA%E9%97%B4/</guid>
-      <description>&lt;p&gt;老师想画几幅热图，需求如下：
-&amp;gt;请帮我做几个heatmap图，当数据是1时是没有差异的，小于1时，表明降低，大于1时，表示增加。因此，能否设“1”为起始点，大于1用红色，随着数字增大，红色加深；
-小于1时用蓝色，随着数字减少，蓝色加深。&lt;/p&gt;</description>
+      <description>&lt;p&gt;老师想画几幅热图，需求如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;请帮我做几个heatmap图，当数据是1时是没有差异的，小于1时，表明降低，大于1时，表示增加。
+因此，能否设“1”为起始点，大于1用红色，随着数字增大，红色加深；小于1时用蓝色，随着数字减少，蓝色加深。
+&lt;/code&gt;&lt;/pre&gt;</description>
     </item>
     
     <item>
@@ -28,9 +30,7 @@
       <pubDate>Thu, 21 Mar 2019 21:04:17 +0800</pubDate>
       
       <guid>https://ZhangRuiQian778.github.io/post/%E5%8D%95%E7%BB%86%E8%83%9Eline-plot/</guid>
-      <description>&lt;h1 id=&#34;line-plot&#34;&gt;line_plot&lt;/h1&gt;
-
-&lt;p&gt;以曲线展示多个基因在时间序列上的表达变化趋势，这种表现形式常见于单细胞测序文章。比如下面这篇文章中的图，把基因进行聚类分为 4 个 clusters 并以热图的形式来可视化，然后对每个 cluster 包含的基因在不同时期的表达变化情况进行可视化也就是热图旁边的 line plot 。&lt;/p&gt;</description>
+      <description>&lt;p&gt;以曲线展示多个基因在时间序列上的表达变化趋势，这种表现形式常见于单细胞测序文章。比如下面这篇文章中的图，把基因进行聚类分为 4 个 clusters 并以热图的形式来可视化，然后对每个 cluster 包含的基因在不同时期的表达变化情况进行可视化也就是热图旁边的 line plot 。&lt;/p&gt;</description>
     </item>
     
     <item>
