@@ -6,10 +6,19 @@
     <description>Recent content on Vidotto&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 08 Apr 2019 22:30:47 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 12 Jun 2019 14:39:08 +0800</lastBuildDate>
     
 	<atom:link href="https://ZhangRuiQian778.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Centos 7 安装 R 和 Rstudio</title>
+      <link>https://ZhangRuiQian778.github.io/post/centos7%E5%AE%89%E8%A3%85r%E5%92%8Crstudio/</link>
+      <pubDate>Wed, 12 Jun 2019 14:39:08 +0800</pubDate>
+      
+      <guid>https://ZhangRuiQian778.github.io/post/centos7%E5%AE%89%E8%A3%85r%E5%92%8Crstudio/</guid>
+      <description>&lt;p&gt;Rstudio server 在服务器上的使用体验非常好，能够利用服务器的高性能并且运行稳定。但是在安装 R 和Rstudio Server 的时候我也遇到一些问题，比如如何更新 R 的版本，又如 Rstudio 不能作图的问题。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Pheatmap 颜色区间</title>

@@ -62,6 +62,31 @@
             <div class="col-8" id="main">
                 <div class="res-cons">
                     
+                        <article class="post">
+                            <header>
+                                <h2 class="post-title">
+                                    <a href="https://ZhangRuiQian778.github.io/post/vep%E6%B3%A8%E9%87%8A%E7%AA%81%E5%8F%98%E5%B0%8F%E8%AE%B0/">VEP注释突变小记</a>
+                                </h2>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2018年4月14日
+                                15:33
+                            </date>
+                            
+                            <div class="post-content">
+                                
+                                
+                                    VEP 是由 Ensemble 提供的突变注释工具，它能够提供强大且详细的突变注释信息。VEP 推荐使用 Cache database 来对突变进行注释。软件是由 perl 编写，软件的安装还是比较麻烦需要安装几个必要的 perl 模块。但是 VEP 同时提供的 docker 镜像，所以我就选择使用 docker 的方式来运行 VEP，省去了安装软件的麻烦。
+现在我安装一些常见的软件都是使用神器 Conda 安装，如果没有被收录到软件库中就去 DockerHub 搜一下碰碰运气，Docker 技术近两年非常火很多软件开发者都会上传软件镜像到 DockerHub。建议学习一下 Docker 了解一下新技术。 1. 从 DockerHub 上获取镜像
+docker pull willmclaren/ensembl-vep   下载安装需要的 Cache Data
+docekr run -i -t -v $HOME/vep_data:/home/vep/.vep willmclaren/ensembl-vep perl INSTALL.pl  -v 参数挂载一个主机目录到容器中，下载的 Cache 默认会存在于 /home/vep/.vep 文件夹中。按照软件提示下载即可，最好将所选物种的所有 Cache 都下载。这个过程比较耗费时间，记得对下载完成的 Cache 创建索引，会在后面注释过程节省时间。这里我选择的是山羊物种的 Cache。
+ 为 Cache 构建索引
+docekr run -i -t -v $HOME/vep_data:/home/vep/.
+                                
+                                <a href="https://ZhangRuiQian778.github.io/post/vep%E6%B3%A8%E9%87%8A%E7%AA%81%E5%8F%98%E5%B0%8F%E8%AE%B0/">阅读全文</a>
+                            </div>
+                        </article>
+                    
 
                     
 
