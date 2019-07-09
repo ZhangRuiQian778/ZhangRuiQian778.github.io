@@ -1,0 +1,121 @@
+---
+title: "集群任务管理系统 PBS 笔记"
+date: 2019-07-09T10:17:40+08:00
+draft: true
+---
+
+高性能计算机集群需要通过任务管理系统投递使用，以前没有用过集群所以不太会用，把一些参数和使用技巧记录在这方便查看。
+
+## 一、作业提交和管理
+
+| 命令  |    功能     |        示例        |
+| ----- | ----------- | ------------------ |
+| qusb  | 提交作业     | qsub test.pbs      |
+| qdel  | 删除作业     | qdel work_id       |
+| qhold | 挂起作业     | qhold work_id      |
+| qrls  | 释放挂起作业 | qrls work_id       |
+| qmove | 移动作业队列 | qmove high work_id |
+
+## 二、作业查询
+作业状态查询命令为 `qstat`,提交作业后通过该命令查看任务运行状况。  
+
+| 命令 |         说明         |
+| --- | -------------------- |
+| -f   | 指定作业             |
+| -a   | 列出系统所有作业      |
+| -i   | 列出不在运行的作业     |
+| -n   | 列出分配给此作业的结点 |
+| -R   | 列出磁盘预留信息      |
+| -Q   | 队列状态             |
+| -u   | 列出作业状态          |
+| -B   | 列出PBS Server信息   |
+| -r   | 列出所有正在运行的作业 |
+| -au  | 列出指定用户的所有作业 |
+
+![](_v_images/20190708104229705_31893.png)  
+
+## 三、作业终止
+作业中止删除通过 `qdel` 命令完成。  
+```
+qdel work_id
+```
+
+## 四、PBS 常用环境变量
+|     名称      |      含义       |
+| :-----------: | :------------: |
+|  PBS_O_HOST   | 提交的节点的名称 |
+|  PBS_O_QUEUE  |  作业队列的名称  |
+| PBS_O_WORKDIR |  作业的绝对路径  |
+| PBS_NODEFILE  | 作业运行的节点名 |
+
+## 五、PBS 作业参数
+通常将参数写入作业提交脚本中。  
+
+|              参数              |                                                  说明                                                  |
+| :----------------------------: | :---------------------------------------------------------------------------------------------------: |
+|         [-a date_time]         |                 表示经过date_time 时间后作业才可以运行,格式为：[[[[CC]YY]MM]DD]hhmm[.SS]                  |
+|        [-A user_name]	         |                                 使用不同用户名提交作业，缺省使用当前用户名                                 |
+|         [-c interval]          |                           定义作业的检查点间隔，如果机器不支持检查点，则忽略此选项                           |
+|     [-C directive_prefix]      |        在脚本文件中以directive_prefix 开头的行解释为qsub 的命令选项。（若无此选项，则默认为’#PBS’ ）         |
+|           [-e path]            |                                        将标准错误信息重定向到path                                        |
+|              [-I]              |                                             以交互方式运行                                              |
+|           [-j oe\eo]           |                          将标准输出信息与标准错误信息.oe合并到输出。eo合并到错误。                          |
+|           [-k keep]            | 定义在执行结点上保留标准输出和标准错误信息中的哪个文件.keep 为o 表示保留前者，e 表示后者，oe 或eo 表示二者都保留 |
+|       [-l nodes=N:ppn=M]       |                                      请求N个结点，每个结点M个处理器                                      |
+|     [-l mem=N[K\M\G][B\W]]     |                             请求N {kilo\mega\giga}{bytes\words} 大小的内存                              |
+|    [-l walltime=888:00:00]     |                                              作业时间估计                                               |
+|       [-m mail_options]        |       mail_option为a：作业abort 时给用户发信；为b：作业开始运行发信；为e：作业结束运行时发信。默认为a。        |
+|         [-M user_list]         |                                     定义有关此作业的mail 发给哪些用户                                     |
+|           [-N name]            |                                作业名，限15 个字符，首字符为字母，无空格。                                 |
+|           [-o path]            |                                          重定向标准输出到path                                           |
+|         [-p priority]          |                               任务优先级，整数，[-1024，1023]，若无定义则为0                               |
+|        [-q destination]        |                         destination 有三种形式： queue , @server, queue@server                          |
+|            [-r y\n]            |                                指明作业是否可运行，y 为可运行，n 为不可运行                                |
+|         [-S path_list]         |                                 指明执行运行脚本所用的shell，须包含全路径                                 |
+|         [-u user_list]         |                                  定义作业将在运行结点上以哪个用户名来运行                                  |
+|       [-v variable_list]       |                                  定义export 到本作业的环境变量的扩展列表                                  |
+|              [-V]              |                               表明qsub 命令的所有环境变量都export 到此作业                                |
+| [-W additional_attributes]	 |                                 additional_attributes ： 作业的其它属性                                 |
+|              [-z]              |                                指明qsub 命令提交作业后，不在终端显示作业号                                 |
+
+
+## 六、export 环境变量
+使用 qsub 提交命令时可以在脚本中写明命令的绝对路径，但是遇到一个麻烦就是软件还需要其他软件做依赖。这时就需要 `-v` 参数将软件的环境变量传入。其实安装软件用 conda 比较多所以通常只将 conda 的环境变量传入即可，例如：  
+```
+qsub -v PATH="/home/zhangruiqian/miniconda3/bin:$PATH" rcorrector.pbs
+```
+
+## 六、批量提交作业
+借助 `-v` 参数就可以很方便的通过 shell 完成批量提交作业。
+1. 作业文件 `rcorrector.pbs`  
+
+```
+#!/bin/bash
+
+#PBS -q low
+#PBS -N kmers
+#PBS -l nodes=1:ppn=10
+#PBS -o rcorrector.log
+#PBS -e rcorrector.err
+
+cd $PBS_O_WORKDIR
+
+run_rcorrector.pl  -t 10 -od ./output/Rcorrector -1 input/${SAMPLE}_1.fq -2 input/rawdata/${SAMPLE}_2.fq
+```
+
+2. 样品列表 `sample.txt`  
+
+```
+sample1
+sample2
+sample3
+```
+
+3. 批量提交任务
+
+```
+cat sample.txt |while read id 
+qsub -v SAMPLE=${id}, PATH="/home/zhangruiqian/miniconda3/bin:$PATH" rcorrector.pbs
+done
+```
+
